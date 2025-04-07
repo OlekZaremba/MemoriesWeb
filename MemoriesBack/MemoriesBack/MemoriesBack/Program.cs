@@ -23,8 +23,9 @@ namespace MemoriesBack
                 app.UseSwaggerUI();
             }
             
-            app.UseAuthorization();
-
+            app.UseAuthorization(); 
+            
+            Console.WriteLine();
 
             app.MapControllers();
 
