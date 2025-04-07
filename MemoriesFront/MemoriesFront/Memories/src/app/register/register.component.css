@@ -1,0 +1,70 @@
+.bg {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url("/login-page-background.jpg");
+  background-size: cover;
+  font-family: "Roboto", sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 5px;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /*gap: 1rem;*/
+}
+
+input {
+  border: none;
+  outline: none;
+  width: 28rem;
+  height: 2.5rem;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: rgb(222, 230, 235);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 4rem;
+  margin-bottom: 2rem;
+}
+
+.buttons button {
+  border: none;
+  width: 12rem;
+  height: 3rem;
+  background-color: #0795ff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+  border-radius: 5px;
+  transition: .2s ease-in-out;
+}
+
+.buttons button:hover {
+  background-color: #156cdd;
+  cursor: pointer;
+}
+
+.container span {
+  font-size: 0.6rem;
+}
