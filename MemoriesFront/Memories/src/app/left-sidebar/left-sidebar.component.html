@@ -1,0 +1,22 @@
+<div class="sidebar">
+  <div class="buttons">
+    <button [class.active]="activeButton === 'motyw'" (click)="setActive('motyw')">
+      Motyw
+    </button>
+    <button [class.active]="activeButton === 'glowna'" (click)="setActive('glowna')">
+      Strona główna
+    </button>
+    <button [class.active]="activeButton === 'oceny'" (click)="setActive('oceny')">
+      Oceny
+    </button>
+    <button [class.active]="activeButton === 'plan'" (click)="setActive('plan')">
+      Plan zajęć
+    </button>
+    <button [class.active]="activeButton === 'wykresy'" (click)="setActive('wykresy')">
+      Wykresy
+    </button>
+    <button [class.active]="activeButton === 'wyloguj'" (click)="setActive('wyloguj')">
+      Wyloguj
+    </button>
+  </div>
+</div>
