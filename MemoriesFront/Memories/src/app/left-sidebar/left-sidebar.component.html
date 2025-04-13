@@ -1,22 +1,10 @@
 <div class="sidebar">
   <div class="buttons">
-    <button [class.active]="activeButton === 'motyw'" (click)="setActive('motyw')">
-      Motyw
-    </button>
-    <button [class.active]="activeButton === 'glowna'" (click)="setActive('glowna')">
-      Strona główna
-    </button>
-    <button [class.active]="activeButton === 'oceny'" (click)="setActive('oceny')">
-      Oceny
-    </button>
-    <button [class.active]="activeButton === 'plan'" (click)="setActive('plan')">
-      Plan zajęć
-    </button>
-    <button [class.active]="activeButton === 'wykresy'" (click)="setActive('wykresy')">
-      Wykresy
-    </button>
-    <button [class.active]="activeButton === 'wyloguj'" (click)="setActive('wyloguj')">
-      Wyloguj
-    </button>
+    <button><img src="/contrast.png">Motyw</button>
+    <button [class.active]="activeButton === 'glowna'" (click)="setActive('glowna')"><img src="/home.png">Strona główna</button>
+    <button [class.active]="activeButton === 'oceny'" (click)="setActive('oceny')"><img src="/exam.png">Oceny</button>
+    <button [class.active]="activeButton === 'plan'" (click)="setActive('plan')"><img src="/event.png">Plan zajęć</button>
+    <button [class.active]="activeButton === 'wykresy'" (click)="setActive('wykresy')"><img src="/trend.png">Wykresy</button>
+    <button routerLink="/"><img src="/logout.png">Wyloguj</button>
   </div>
 </div>
