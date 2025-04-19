@@ -37,47 +37,4 @@
   gap: 1rem;
 }
 
-.content-left {
-  height: 100%;
-  width: 40%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1rem;
-}
 
-.content-right {
-  height: 100%;
-  width: 60%;
-  display: flex; /* <- konieczne */
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.grades,
-.teachers,
-.classes {
-  flex: 1;
-  display: flex;
-  background-color: ghostwhite;
-  border-radius: 7px;
-}
-
-.schedule {
-  flex: 1;
-  display: flex;
-}
-
-
-.small-tile {
-  width: 100%;
-  flex: 1;
-}
-
-.tile {
-  width: 100%;
-  flex: 1;
-  background-color: ghostwhite;
-  border-radius: 7px;
-}

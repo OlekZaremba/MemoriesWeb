@@ -53,3 +53,7 @@ input {
 .container span {
   font-size: 0.6rem;
 }
+
+.next {
+  width: 2rem;
+}
