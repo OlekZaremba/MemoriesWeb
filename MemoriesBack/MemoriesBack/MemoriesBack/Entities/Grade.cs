@@ -41,5 +41,8 @@ namespace MemoriesBack.Entities
         public int SchoolClassId { get; set; }
 
         public SchoolClass SchoolClass { get; set; }
+
+        [Required]
+        public bool Notified { get; set; } = false;
     }
 }

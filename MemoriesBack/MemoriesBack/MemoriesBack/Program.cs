@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using MemoriesBack.Data;
 using System;
+using MemoriesBack.Repository;
 
 namespace MemoriesBack
 {
@@ -16,6 +17,18 @@ namespace MemoriesBack
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
                 ));
+
+            builder.Services.AddScoped<GradeRepository>();
+            builder.Services.AddScoped<GroupMemberClassRepository>();
+            builder.Services.AddScoped<GroupMemberRepository>();
+            builder.Services.AddScoped<PasswordResetTokenRepository>();
+            builder.Services.AddScoped<ScheduleRepository>();
+            builder.Services.AddScoped<SchoolClassRepository>();
+            builder.Services.AddScoped<SensitiveDataRepository>();
+            builder.Services.AddScoped<UserGroupRepository>();
+            builder.Services.AddScoped<UserRepository>();
+
+
 
             builder.Services.Configure<FormOptions>(options =>
             {
@@ -39,16 +52,13 @@ namespace MemoriesBack
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-<<<<<<< HEAD
             
             app.UseAuthorization(); 
             
             Console.WriteLine();
 
-=======
 
             app.UseAuthorization();
->>>>>>> d74d079 (Added entities for all the classes)
             app.MapControllers();
             app.Run();
         }
