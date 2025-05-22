@@ -18,9 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Config\" />
-    <Folder Include="Exception\" />
-    <Folder Include="Controller\" />
-    <Folder Include="Service\" />
   </ItemGroup>
 
 </Project>

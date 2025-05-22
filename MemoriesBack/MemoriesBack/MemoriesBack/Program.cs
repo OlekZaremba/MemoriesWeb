@@ -5,6 +5,7 @@ using System;
 using MemoriesBack.Repository;
 using MemoriesBack.Entities;
 using Microsoft.AspNetCore.Identity;
+using MemoriesBack.Service;
 
 namespace MemoriesBack
 {
@@ -30,7 +31,9 @@ namespace MemoriesBack
             builder.Services.AddScoped<UserGroupRepository>();
             builder.Services.AddScoped<UserRepository>();
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<PasswordResetService>();
+            builder.Services.AddScoped<EmailService>();
 
 
 
@@ -44,6 +47,8 @@ namespace MemoriesBack
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            app.UseMiddleware<MemoriesBack.Middlewares.ExceptionMiddleware>();
 
             using (var scope = app.Services.CreateScope())
             {

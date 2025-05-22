@@ -42,5 +42,11 @@ namespace MemoriesBack.Repository
                 .Where(gm => gm.UserGroupId == userGroupId)
                 .ToListAsync();
         }
+
+        public async Task AddAsync(GroupMember gm)
+        {
+            await _context.GroupMembers.AddAsync(gm);
+            await _context.SaveChangesAsync();
+        }
     }
 }
