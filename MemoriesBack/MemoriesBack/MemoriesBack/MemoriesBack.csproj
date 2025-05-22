@@ -18,10 +18,8 @@
 
   <ItemGroup>
     <Folder Include="Config\" />
-    <Folder Include="DTO\" />
     <Folder Include="Exception\" />
     <Folder Include="Controller\" />
-    <Folder Include="Repository\" />
     <Folder Include="Service\" />
   </ItemGroup>
 
