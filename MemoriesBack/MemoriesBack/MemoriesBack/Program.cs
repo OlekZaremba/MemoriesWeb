@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using MemoriesBack.Data;
 using System;
 using MemoriesBack.Repository;
+using MemoriesBack.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace MemoriesBack
 {
@@ -27,6 +29,8 @@ namespace MemoriesBack
             builder.Services.AddScoped<SensitiveDataRepository>();
             builder.Services.AddScoped<UserGroupRepository>();
             builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
 
 
 
