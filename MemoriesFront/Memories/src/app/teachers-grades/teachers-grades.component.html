@@ -1,0 +1,32 @@
+<div class="main">
+  <div class="content">
+    <div class="grades">
+      <div class="tile ">
+        <h2>Oceny</h2>
+        <!--    KOM DLA ADIEGO: CAŁY TEN DIV MA ZNIKNĄĆ, JEŻELI ROLA != NAUCZYCIEL-->
+        <div class="teacher-control-buttons">
+          <button (click)="goToAddGrade()">Dodaj ocenę</button>
+        </div>
+        <div class="student-grades-table">
+          <!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ PRZEDMIOTY DYNAMICZNIE Z BAZY DANYCH I ICH ŚREDNIA-->
+          <table class="subjects-table">
+            <thead>
+            <tr>
+              <th>Przedmiot</th>
+              <th>Średnia</th>
+              <th>Akcja</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Matematyka</td>
+              <td>3.00</td>
+              <td><button class="goToGrade" (click)="goToGradeView()">Przejdź</button></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

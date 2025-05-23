@@ -1,0 +1,53 @@
+<div class="grades">
+  <div class="tile">
+    <h2>Wybierz grupę</h2>
+    <div class="student-grades-table">
+      <div class="student-grades-table">
+      <!--    KOM DLA ADIEGO: TUTAJ MAJĄ SIĘ ŁADOWAĆ KLASY KTÓRE MA NAUCZYCIEL-->
+        <table class="subjects-table">
+          <thead>
+          <tr>
+            <th>Grupa</th>
+            <th>Akcja</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Klasa 1</td>
+            <td><button class="addGrade" (click)="openModal()">Dodaj ocenę</button></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--    KOM DLA ADIEGO: TUTAJ TWORZY SIĘ MODAL CZYLI POPUP, POWINIEN ŁADOWAĆ UCZNIÓW Z DANEJ WYBRANEJ KLASY I WSTAWIAĆ JE DO LISTY I ZAPISYWAĆ DLA DANEGO UCZNIA-->
+<!-- Modal -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal">
+    <h2>Nazwa twojego przedmiotu</h2>
+
+    <label>Wybierz ucznia:</label>
+    <select [(ngModel)]="selectedStudent">
+      <option *ngFor="let student of students" [value]="student">{{ student }}</option>
+    </select>
+
+    <label>Wybierz ocenę:</label>
+    <select [(ngModel)]="selectedGrade">
+      <option *ngFor="let grade of grades" [value]="grade">{{ grade }}</option>
+    </select>
+
+    <label>Typ oceny:</label>
+    <input type="text" [(ngModel)]="gradeType" />
+
+    <label>Dodaj komentarz:</label>
+    <textarea [(ngModel)]="comment"></textarea>
+
+    <div class="modal-buttons">
+      <button (click)="saveGrade()">Zapisz</button>
+      <button (click)="closeModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
