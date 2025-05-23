@@ -18,6 +18,18 @@ namespace MemoriesBack.Repository
             _context = context;
         }
 
+        public async Task AddAsync(Schedule schedule)
+        {
+            await _context.Schedules.AddAsync(schedule);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddRangeAsync(IEnumerable<Schedule> schedules)
+        {
+            await _context.Schedules.AddRangeAsync(schedules);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<ScheduleResponseDTO>> GetByGroupAndDateRangeAsync(int groupId, DateTime from, DateTime to)
         {
             return await _context.Schedules
