@@ -1,0 +1,47 @@
+<div class="grades">
+  <div class="tile">
+    <h2>Oceny uczniów - Klasa 1</h2>
+
+    <div class="student-grades-table">
+      <table class="subjects-table">
+        <thead>
+        <tr>
+          <th>Uczeń</th>
+          <th>Oceny</th>
+          <th>Średnia</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Jan Kowalski</td>
+          <td><button class="addGrade" (click)="openModal()">2+</button></td>
+          <td>2.50</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal">
+    <h2>Szczegóły oceny</h2>
+
+    <label>Uczeń:</label>
+    <input type="text" [value]="selectedGrade.student" disabled />
+
+    <label>Ocena:</label>
+    <input type="text" [value]="selectedGrade.grade" disabled />
+
+    <label>Typ oceny:</label>
+    <input type="text" [value]="selectedGrade.type" disabled />
+
+    <label>Komentarz:</label>
+    <textarea [value]="selectedGrade.comment" disabled></textarea>
+
+    <div class="modal-buttons">
+      <button (click)="closeModal()">Zamknij</button>
+    </div>
+  </div>
+</div>
