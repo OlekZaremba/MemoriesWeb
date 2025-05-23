@@ -52,5 +52,13 @@ namespace MemoriesBack.Repository
                 .Where(gmc => gmc.SchoolClassId == classId)
                 .ToListAsync();
         }
+
+        public async Task<List<GroupMemberClass>> GetByUserGroupIdAsync(int userGroupId)
+        {
+            return await _context.GroupMemberClasses
+                .Include(gmc => gmc.SchoolClass)
+                .Where(gmc => gmc.GroupMember.UserGroupId == userGroupId)
+                .ToListAsync();
+        }
     }
 }

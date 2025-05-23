@@ -16,6 +16,27 @@ namespace MemoriesBack.Repository
             _context = context;
         }
 
+        public async Task AddAsync(Grade grade)
+        {
+            await _context.Grades.AddAsync(grade);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Grade?> GetByIdAsync(int id)
+        {
+            return await _context.Grades
+                .Include(g => g.Student)
+                .Include(g => g.Teacher)
+                .Include(g => g.SchoolClass)
+                .FirstOrDefaultAsync(g => g.Id == id);
+        }
+
+        public async Task UpdateManyAsync(IEnumerable<Grade> grades)
+        {
+            _context.Grades.UpdateRange(grades);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Grade>> GetByStudentAndClassAsync(int studentId, int classId)
         {
             return await _context.Grades
@@ -24,14 +45,14 @@ namespace MemoriesBack.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Grade>> GetNotNotifiedByStudentAsync(int studentId)
+        public async Task<IEnumerable<Grade>> GetNotNotifiedGradesByStudentIdAsync(int studentId)
         {
             return await _context.Grades
                 .Where(g => g.StudentId == studentId && !g.Notified)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<SchoolClass>> GetDistinctClassesByTeacherAsync(int teacherId)
+        public async Task<IEnumerable<SchoolClass>> GetDistinctClassesByTeacherIdAsync(int teacherId)
         {
             return await _context.Grades
                 .Where(g => g.TeacherId == teacherId)
@@ -47,7 +68,7 @@ namespace MemoriesBack.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<int>> GetDistinctGroupIdsByTeacherAsync(int teacherId)
+        public async Task<IEnumerable<int>> GetDistinctGroupIdsByTeacherIdAsync(int teacherId)
         {
             return await _context.GroupMembers
                 .Where(gm =>
@@ -59,7 +80,7 @@ namespace MemoriesBack.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Grade>> GetByStudentOrderedDescAsync(int studentId)
+        public async Task<IEnumerable<Grade>> GetByStudentIdAsync(int studentId)
         {
             return await _context.Grades
                 .Where(g => g.StudentId == studentId)

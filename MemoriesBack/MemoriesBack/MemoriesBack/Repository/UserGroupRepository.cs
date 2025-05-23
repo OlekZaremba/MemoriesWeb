@@ -34,6 +34,13 @@ namespace MemoriesBack.Repository
             return await _context.UserGroups.FindAsync(id);
         }
 
+        public async Task<List<UserGroup>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _context.UserGroups
+                .Where(ug => ids.Contains(ug.Id))
+                .ToListAsync();
+        }
+
         public async Task AddAsync(UserGroup group)
         {
             await _context.UserGroups.AddAsync(group);
