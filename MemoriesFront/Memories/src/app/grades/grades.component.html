@@ -7,6 +7,7 @@
         <div class="teacher-control-buttons">
           <button (click)="goToAddGrade()">Dodaj ocenę</button>
         </div>
+<!--        TABELA OCEN DLA UCZNIÓW!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
         <div class="student-grades-table">
 <!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ PRZEDMIOTY DYNAMICZNIE Z BAZY DANYCH I ICH ŚREDNIA-->
           <table class="subjects-table">
@@ -22,6 +23,34 @@
               <td>Matematyka</td>
               <td>3.00</td>
               <td><button class="goToGrade" (click)="goToGradeView()">Przejdź</button></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+        <!--        TABELA OCEN DLA NAUCZYCIELI!!!!!!!!-->
+
+        <br>
+        tu sekcja nauczycieli - chować w zależności od roli
+
+        <div class="student-grades-table">
+          <!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ PRZEDMIOTY DYNAMICZNIE Z BAZY DANYCH I ICH ŚREDNIA-->
+          <table class="subjects-table">
+            <thead>
+            <tr>
+              <th>Klasa</th>
+              <th>Akcja</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Klasa 1</td>
+              <td><button class="goToGrade" (click)="goToGroupGrades()">Przeglądaj oceny</button></td>
+            </tr>
+            <tr>
+              <td>Klasa 2</td>
+              <td><button class="goToGrade" (click)="goToGroupGrades()">Przeglądaj oceny</button></td>
             </tr>
             </tbody>
           </table>

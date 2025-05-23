@@ -18,4 +18,9 @@ export class GradesComponent {
   goToAddGrade() {
     this.navigateTo.emit('add-grade');
   }
+
+  goToGroupGrades() {
+    this.navigateTo.emit('group-grades');
+  }
+
 }
