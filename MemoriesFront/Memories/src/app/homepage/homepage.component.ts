@@ -5,6 +5,7 @@ import {HomeComponent} from '../home/home.component';
 import {GradesComponent} from '../grades/grades.component';
 import {CommonModule} from '@angular/common';
 import {GradeViewComponent} from '../grade-view/grade-view.component';
+import {AddGradeComponent} from '../add-grade/add-grade.component';
 
 @Component({
   selector: 'app-homepage',
@@ -15,7 +16,8 @@ import {GradeViewComponent} from '../grade-view/grade-view.component';
     LeftSidebarComponent,
     HomeComponent,
     GradesComponent,
-    GradeViewComponent
+    GradeViewComponent,
+    AddGradeComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'
@@ -26,13 +28,18 @@ export class HomepageComponent {
   @ViewChild(LeftSidebarComponent, { static: true })
   leftSidebar!: LeftSidebarComponent;
 
-  setActiveView(view: any) {
+  setActiveView(view: string) {
     console.log('Ustawiam widok na:', view, typeof view);
     this.activeView = view;
 
     if (this.leftSidebar) {
-      this.leftSidebar.setActive('oceny');
+      if (view === 'grade-view' || view == 'add-grade') {
+        this.leftSidebar.setActive('oceny');
+      } else {
+        this.leftSidebar.setActive(view);
+      }
     }
   }
+
 
 }

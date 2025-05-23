@@ -3,8 +3,9 @@
     <div class="grades">
       <div class="tile ">
         <h2>Oceny</h2>
+<!--    KOM DLA ADIEGO: CAŁY TEN DIV MA ZNIKNĄĆ, JEŻELI ROLA != NAUCZYCIEL-->
         <div class="teacher-control-buttons">
-          <button>Dodaj ocenę</button>
+          <button (click)="goToAddGrade()">Dodaj ocenę</button>
         </div>
         <div class="student-grades-table">
 <!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ PRZEDMIOTY DYNAMICZNIE Z BAZY DANYCH I ICH ŚREDNIA-->
@@ -24,7 +25,6 @@
             </tr>
             </tbody>
           </table>
-
         </div>
       </div>
     </div>

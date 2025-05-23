@@ -14,4 +14,8 @@ export class GradesComponent {
     console.log('klik działa!');
     this.navigateTo.emit('grade-view');
   }
+
+  goToAddGrade() {
+    this.navigateTo.emit('add-grade');
+  }
 }
