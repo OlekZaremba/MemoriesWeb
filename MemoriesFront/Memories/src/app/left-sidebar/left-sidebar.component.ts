@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {LucideAngularModule} from 'lucide-angular';
 
@@ -13,12 +13,12 @@ import {LucideAngularModule} from 'lucide-angular';
   styleUrl: './left-sidebar.component.css'
 })
 export class LeftSidebarComponent {
-  activeButton: string = 'glowna'; // domyślnie aktywny
+  @Output() viewChange = new EventEmitter<string>();
+  activeButton: string = 'glowna';
 
-  setActive(button: string) {
-    this.activeButton = button;
-
-    // Możesz też tutaj podmieniać komponent lub logikę
-    // np. this.loadComponent(button);
+  setActive(view: string) {
+    this.activeButton = view;
+    this.viewChange.emit(view);
   }
 }
+

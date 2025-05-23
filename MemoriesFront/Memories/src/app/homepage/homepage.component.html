@@ -5,10 +5,12 @@
 
   <div class="main-content">
     <div class="sidebar">
-      <app-left-sidebar></app-left-sidebar>
+      <app-left-sidebar (viewChange)="setActiveView($event)"></app-left-sidebar>
     </div>
-      <div class="content">
-        <app-home></app-home>
-      </div>
+    <div class="content">
+      <app-home *ngIf="activeView === 'glowna'" (navigateTo)="setActiveView($event)"></app-home>
+      <app-grades *ngIf="activeView === 'oceny'"></app-grades>
+    </div>
+
     </div>
 </div>
