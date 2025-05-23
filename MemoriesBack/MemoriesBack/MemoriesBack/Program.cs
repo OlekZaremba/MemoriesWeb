@@ -1,3 +1,11 @@
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
+using MemoriesBack.Data;
+using System;
+using MemoriesBack.Repository;
+using MemoriesBack.Entities;
+using Microsoft.AspNetCore.Identity;
+using MemoriesBack.Service;
 
 namespace MemoriesBack
 {
@@ -7,16 +15,48 @@ namespace MemoriesBack
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseMySql(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+                ));
+
+            builder.Services.AddScoped<GradeRepository>();
+            builder.Services.AddScoped<GroupMemberClassRepository>();
+            builder.Services.AddScoped<GroupMemberRepository>();
+            builder.Services.AddScoped<PasswordResetTokenRepository>();
+            builder.Services.AddScoped<ScheduleRepository>();
+            builder.Services.AddScoped<SchoolClassRepository>();
+            builder.Services.AddScoped<SensitiveDataRepository>();
+            builder.Services.AddScoped<UserGroupRepository>();
+            builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<PasswordResetService>();
+            builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<AssignmentService>();
+
+
+
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
+            });
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            app.UseMiddleware<MemoriesBack.Middlewares.ExceptionMiddleware>();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate();
+            }
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -27,8 +67,9 @@ namespace MemoriesBack
             
             Console.WriteLine();
 
-            app.MapControllers();
 
+            app.UseAuthorization();
+            app.MapControllers();
             app.Run();
         }
     }
