@@ -60,6 +60,7 @@ namespace MemoriesBack.Repository
                 .Where(gmc => gmc.GroupMember.UserGroupId == userGroupId)
                 .ToListAsync();
         }
+
         public async Task<GroupMemberClass?> GetByIdAsync(int id)
         {
             return await _context.GroupMemberClasses
@@ -70,5 +71,11 @@ namespace MemoriesBack.Repository
                 .FirstOrDefaultAsync(gmc => gmc.Id == id);
         }
 
+        // NOWA METODA
+        public async Task AddAsync(GroupMemberClass entity)
+        {
+            await _context.GroupMemberClasses.AddAsync(entity);
+            await _context.SaveChangesAsync();
+        }
     }
 }

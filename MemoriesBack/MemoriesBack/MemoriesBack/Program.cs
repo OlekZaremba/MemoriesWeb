@@ -34,6 +34,7 @@ namespace MemoriesBack
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<PasswordResetService>();
             builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<AssignmentService>();
 
 
 
