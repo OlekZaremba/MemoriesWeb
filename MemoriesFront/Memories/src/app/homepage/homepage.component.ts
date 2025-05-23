@@ -7,6 +7,7 @@ import {CommonModule} from '@angular/common';
 import {GradeViewComponent} from '../grade-view/grade-view.component';
 import {AddGradeComponent} from '../add-grade/add-grade.component';
 import {GroupGradesComponent} from '../group-grades/group-grades.component';
+import {UsersComponent} from '../users/users.component';
 
 @Component({
   selector: 'app-homepage',
@@ -19,7 +20,8 @@ import {GroupGradesComponent} from '../group-grades/group-grades.component';
     GradesComponent,
     GradeViewComponent,
     AddGradeComponent,
-    GroupGradesComponent
+    GroupGradesComponent,
+    UsersComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'
@@ -37,6 +39,8 @@ export class HomepageComponent {
     if (this.leftSidebar) {
       if (view === 'grade-view' || view == 'add-grade' || view == 'group-grades') {
         this.leftSidebar.setActive('oceny');
+      } else if (view === 'uzytkownicy') {
+        this.leftSidebar.setActive('uzytkownicy');
       } else {
         this.leftSidebar.setActive(view);
       }

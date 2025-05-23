@@ -1,0 +1,180 @@
+<div class="main">
+  <div class="content">
+    <div class="grades">
+      <div class="tile ">
+        <h2>Użytkownicy</h2>
+        <!--    KOM DLA ADIEGO: CAŁY TEN DIV ZOSTAJE, JEŻELI ROLA == UCZEŃ A RESZTA SIĘ CHOWA-->
+        <!--        TABELA UŻYTKOWNIKÓW DLA UCZNIÓW!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
+        <div class="student-grades-table">
+          <!--    KOM DLA ADIEGO: TU MAJĄ SIĘ POJAWIAĆ WSZYSCY NAUCZYCIELE KTÓRZY UCZĄ KLASY W KTÓREJ ZNAJDUJE SIĘ DANY UCZEŃ-->
+          <table class="subjects-table">
+            <thead>
+            <tr>
+              <th>Imię i nazwisko nauczyciela</th>
+              <th>Przemiot wiodący</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Jan Nauczycielski</td>
+              <td>język polski</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+        <!--    KOM DLA ADIEGO: CAŁY TEN DIV ZOSTAJE, JEŻELI ROLA == NAUCZYCIEL A RESZTA SIĘ CHOWA-->
+        <!--        TABELA UŻYTKOWNIKÓW DLA NAUCZYCIELI!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
+        <!--    KOM DLA ADIEGO: TU MAJĄ SIĘ POJAWIAĆ WSZYSCY NAUCZYCIELE KTÓRZY UCZĄ KLASY W KTÓREJ ZNAJDUJE SIĘ DANY UCZEŃ-->
+        <br>
+
+        <div class="student-grades-table">
+          <!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ KLASY DYNAMICZNIE Z BAZY DANYCH ŻEBY MÓC PODEJRZEĆ UCZNIÓW (UŻYTKOWNIKÓW)-->
+          <table class="subjects-table">
+            <thead>
+            <tr>
+              <th>Klasa</th>
+              <th>Akcja</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Klasa 1</td>
+              <td><button class="goToGrade">Przeglądaj</button></td>
+            </tr>
+            <tr>
+              <td>Klasa 2</td>
+              <td><button class="goToGrade">Przeglądaj</button></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!--    KOM DLA ADIEGO: CAŁY TEN DIV ZOSTAJE, JEŻELI ROLA == ADMIN A RESZTA SIĘ CHOWA-->
+        <!--        TABELA UŻYTKOWNIKÓW DLA ADMINÓW!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
+        <!--    KOM DLA ADIEGO: TU MAJĄ SIĘ POJAWIAĆ WSZYSCY UŻYTKOWNICY-->
+
+        <div class="teacher-control-buttons">
+          <button>Dodaj użytkownika</button>
+          <input
+            type="text"
+            placeholder="Wpisz nazwę użytkownika"
+            class="user-search-input"
+          />
+        </div>
+
+        <div class="student-grades-table">
+          <table class="subjects-table">
+            <thead>
+            <tr>
+              <th>Imię</th>
+              <th>Nazwisko</th>
+              <th>Grupy</th>
+              <th>E-mail</th>
+              <th>Rola</th>
+              <th>Resetuj hasło</th>
+              <th>Przypisz do grupy</th>
+              <th>Edycja użytkownika</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Uczeń</td>
+              <td>Uczniowski</td>
+              <td>Klasa 1</td>
+              <td>testowymail.com</td>
+              <td>Uczeń</td>
+              <td><button class="goToGrade" (click)="openResetModal('testowymail.com')">Resetuj</button></td>
+              <td><button class="goToGrade" (click)="openAssignModal('Uczeń Uczniowski')">Przypisz</button></td>
+              <td>
+                <button class="goToGrade" (click)="openEditModal({
+                  firstName: 'Uczeń',
+                  lastName: 'Uczniowski',
+                  email: 'testowymail.com',
+                  role: 'Uczeń',
+                  groups: 'Klasa 1'
+                })">Edytuj</button>
+              </td>
+
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Reset password modal -->
+<div class="modal-backdrop" *ngIf="showResetModal">
+  <div class="modal">
+    <h2>Resetowanie hasła</h2>
+
+    <label>E-mail użytkownika:</label>
+    <input type="text" [value]="selectedEmail" disabled />
+
+    <div class="modal-buttons">
+      <button (click)="resetPassword()">Zresetuj hasło</button>
+      <button (click)="closeResetModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign to group modal -->
+<div class="modal-backdrop" *ngIf="showAssignModal">
+  <div class="modal">
+    <h2>Przypisz do grup</h2>
+
+    <label>Użytkownik:</label>
+    <input type="text" [value]="selectedUserName" disabled />
+
+    <label>Wybierz grupy:</label>
+    <label *ngFor="let cls of availableClasses" class="checkbox-row">
+      <input
+        type="checkbox"
+        [checked]="selectedClasses.includes(cls)"
+        #cb
+        (change)="toggleGroup(cls, cb.checked)"
+      />
+      {{ cls }}
+    </label>
+    <div class="modal-buttons">
+      <button (click)="assignToGroups()">Zapisz</button>
+      <button (click)="closeAssignModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit user modal -->
+<div class="modal-backdrop" *ngIf="showEditModal">
+  <div class="modal">
+    <h2>Edytuj użytkownika</h2>
+
+    <label>Imię:</label>
+    <input type="text" [(ngModel)]="editUser.firstName" />
+
+    <label>Nazwisko:</label>
+    <input type="text" [(ngModel)]="editUser.lastName" />
+
+    <label>E-mail:</label>
+    <input type="email" [(ngModel)]="editUser.email" />
+
+    <label>Grupy:</label>
+    <input type="text" [(ngModel)]="editUser.groups" />
+
+    <label>Rola:</label>
+    <select [(ngModel)]="editUser.role">
+      <option value="Uczeń">Uczeń</option>
+      <option value="Nauczyciel">Nauczyciel</option>
+      <option value="Admin">Admin</option>
+    </select>
+
+    <div class="modal-buttons">
+      <button (click)="saveUserEdits()">Zapisz</button>
+      <button (click)="closeEditModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
