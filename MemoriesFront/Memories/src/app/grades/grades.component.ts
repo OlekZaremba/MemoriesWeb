@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-grades',
@@ -8,5 +8,10 @@ import { Component } from '@angular/core';
   styleUrl: './grades.component.css'
 })
 export class GradesComponent {
+  @Output() navigateTo = new EventEmitter<string>();
 
+  goToGradeView() {
+    console.log('klik działa!');
+    this.navigateTo.emit('grade-view');
+  }
 }

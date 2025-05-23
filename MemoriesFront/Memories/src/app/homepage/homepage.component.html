@@ -9,7 +9,9 @@
     </div>
     <div class="content">
       <app-home *ngIf="activeView === 'glowna'" (navigateTo)="setActiveView($event)"></app-home>
-      <app-grades *ngIf="activeView === 'oceny'"></app-grades>
+      <app-grades *ngIf="activeView === 'oceny'" (navigateTo)="setActiveView($event)"></app-grades>
+      <app-grade-view *ngIf="activeView === 'grade-view'"></app-grade-view>
+
     </div>
 
     </div>

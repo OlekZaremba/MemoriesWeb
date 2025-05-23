@@ -4,6 +4,7 @@ import {LeftSidebarComponent} from '../left-sidebar/left-sidebar.component';
 import {HomeComponent} from '../home/home.component';
 import {GradesComponent} from '../grades/grades.component';
 import {CommonModule} from '@angular/common';
+import {GradeViewComponent} from '../grade-view/grade-view.component';
 
 @Component({
   selector: 'app-homepage',
@@ -13,7 +14,8 @@ import {CommonModule} from '@angular/common';
     MenuNavbarComponent,
     LeftSidebarComponent,
     HomeComponent,
-    GradesComponent
+    GradesComponent,
+    GradeViewComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'
@@ -24,11 +26,13 @@ export class HomepageComponent {
   @ViewChild(LeftSidebarComponent, { static: true })
   leftSidebar!: LeftSidebarComponent;
 
-  setActiveView(view: string) {
+  setActiveView(view: any) {
+    console.log('Ustawiam widok na:', view, typeof view);
     this.activeView = view;
 
     if (this.leftSidebar) {
-      this.leftSidebar.setActive(view);
+      this.leftSidebar.setActive('oceny');
     }
   }
+
 }

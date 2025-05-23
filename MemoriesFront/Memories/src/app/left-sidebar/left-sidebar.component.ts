@@ -17,8 +17,13 @@ export class LeftSidebarComponent {
   activeButton: string = 'glowna';
 
   setActive(view: string) {
-    this.activeButton = view;
-    this.viewChange.emit(view);
+    if (this.activeButton !== view) {
+      this.activeButton = view;
+      this.viewChange.emit(view);
+    } else {
+      this.activeButton = view;
+    }
   }
+
 }
 
