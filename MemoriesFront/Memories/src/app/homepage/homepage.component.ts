@@ -8,6 +8,7 @@ import {GradeViewComponent} from '../grade-view/grade-view.component';
 import {AddGradeComponent} from '../add-grade/add-grade.component';
 import {GroupGradesComponent} from '../group-grades/group-grades.component';
 import {UsersComponent} from '../users/users.component';
+import {GroupUsersComponent} from '../group-users/group-users.component';
 
 @Component({
   selector: 'app-homepage',
@@ -21,7 +22,8 @@ import {UsersComponent} from '../users/users.component';
     GradeViewComponent,
     AddGradeComponent,
     GroupGradesComponent,
-    UsersComponent
+    UsersComponent,
+    GroupUsersComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'
@@ -39,13 +41,11 @@ export class HomepageComponent {
     if (this.leftSidebar) {
       if (view === 'grade-view' || view == 'add-grade' || view == 'group-grades') {
         this.leftSidebar.setActive('oceny');
-      } else if (view === 'uzytkownicy') {
+      } else if (view === 'uzytkownicy' || view == 'group-users') {
         this.leftSidebar.setActive('uzytkownicy');
       } else {
         this.leftSidebar.setActive(view);
       }
     }
   }
-
-
 }

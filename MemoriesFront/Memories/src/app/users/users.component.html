@@ -41,11 +41,11 @@
             <tbody>
             <tr>
               <td>Klasa 1</td>
-              <td><button class="goToGrade">Przeglądaj</button></td>
+              <td><button class="goToGrade" (click)="goToGroupUsersView()">Przeglądaj</button></td>
             </tr>
             <tr>
               <td>Klasa 2</td>
-              <td><button class="goToGrade">Przeglądaj</button></td>
+              <td><button class="goToGrade" (click)="goToGroupUsersView()">Przeglądaj</button></td>
             </tr>
             </tbody>
           </table>
@@ -56,7 +56,7 @@
         <!--    KOM DLA ADIEGO: TU MAJĄ SIĘ POJAWIAĆ WSZYSCY UŻYTKOWNICY-->
 
         <div class="teacher-control-buttons">
-          <button>Dodaj użytkownika</button>
+          <button (click)="openCreateModal()">Dodaj użytkownika</button>
           <input
             type="text"
             placeholder="Wpisz nazwę użytkownika"
@@ -175,6 +175,34 @@
     <div class="modal-buttons">
       <button (click)="saveUserEdits()">Zapisz</button>
       <button (click)="closeEditModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create user modal -->
+<div class="modal-backdrop" *ngIf="showCreateModal">
+  <div class="modal">
+    <h2>Dodaj nowego użytkownika</h2>
+
+    <label>Imię:</label>
+    <input type="text" [(ngModel)]="newUser.firstName" />
+
+    <label>Nazwisko:</label>
+    <input type="text" [(ngModel)]="newUser.lastName" />
+
+    <label>E-mail:</label>
+    <input type="email" [(ngModel)]="newUser.email" />
+
+    <label>Rola:</label>
+    <select [(ngModel)]="newUser.role">
+      <option value="Uczeń">Uczeń</option>
+      <option value="Nauczyciel">Nauczyciel</option>
+      <option value="Admin">Admin</option>
+    </select>
+
+    <div class="modal-buttons">
+      <button (click)="createUser()">Zapisz</button>
+      <button (click)="closeCreateModal()">Anuluj</button>
     </div>
   </div>
 </div>

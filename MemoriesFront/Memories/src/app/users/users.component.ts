@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { NgIf, NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './users.component.css'
 })
 export class UsersComponent {
+  @Output() navigateTo = new EventEmitter<string>();
   // MODAL: RESET HASŁA
   showResetModal = false;
   selectedEmail: string = '';
@@ -21,6 +22,19 @@ export class UsersComponent {
     role: '',
     groups: ''
   };
+
+  // MODAL: TWORZENIE UŻYTKOWNIKA
+  showCreateModal = false;
+  newUser = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    role: ''
+  };
+
+  goToGroupUsersView() {
+    this.navigateTo.emit('group-users');
+  }
 
   openResetModal(email: string) {
     this.selectedEmail = email;
@@ -77,6 +91,26 @@ export class UsersComponent {
   saveUserEdits() {
     console.log('💾 Zapisano dane użytkownika:', this.editUser);
     this.closeEditModal();
+  }
+
+  openCreateModal() {
+    this.newUser = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      role: 'Uczeń'
+    };
+    this.showCreateModal = true;
+  }
+
+  closeCreateModal() {
+    this.showCreateModal = false;
+  }
+
+  createUser() {
+    console.log('👤 Tworzenie użytkownika:', this.newUser);
+    // Tutaj wywołanie do backendu
+    this.closeCreateModal();
   }
 
   protected readonly HTMLInputElement = HTMLInputElement;
