@@ -1,0 +1,56 @@
+<div class="main">
+  <div class="content">
+    <div class="grades">
+      <div class="tile">
+        <h2>Plan zajęć</h2>
+        <div class="teacher-control-buttons">
+          <input type="date" [(ngModel)]="selectedDate" />
+          <button (click)="openEditModal()">Zmiana planu</button>
+        </div>
+
+        <!-- Lista lekcji -->
+        <div class="schedule-list">
+          <div class="lesson-item" *ngFor="let lesson of getLessonsForSelectedDate()">
+            <div class="lesson-header">
+              <span class="subject">{{ lesson.subject }}</span>
+              <span class="time">{{ lesson.startTime }} – {{ lesson.endTime }}</span>
+            </div>
+            <div class="teacher">Prowadzący: {{ lesson.teacher }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Edycja planu zajęć -->
+<div class="modal-backdrop" *ngIf="showEditModal">
+  <div class="modal">
+    <h2>Edycja planu zajęć</h2>
+
+    <label>Wybierz klasę:</label>
+    <select [(ngModel)]="editLesson.class">
+      <option *ngFor="let cls of availableClasses" [value]="cls">{{ cls }}</option>
+    </select>
+
+    <label>Wybierz nauczyciela z przedmiotem:</label>
+    <select [(ngModel)]="editLesson.teacher">
+      <option *ngFor="let t of availableTeachers" [value]="t">{{ t }}</option>
+    </select>
+
+    <label>Data:</label>
+    <input type="date" [(ngModel)]="editLesson.date" />
+
+    <label>Godzina od:</label>
+    <input type="time" [(ngModel)]="editLesson.startTime" />
+
+    <label>Godzina do:</label>
+    <input type="time" [(ngModel)]="editLesson.endTime" />
+
+    <div class="modal-buttons">
+      <button (click)="saveLesson()">Zapisz</button>
+      <button (click)="closeEditModal()">Anuluj</button>
+    </div>
+  </div>
+</div>

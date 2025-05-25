@@ -16,6 +16,7 @@
       <app-users *ngIf="activeView === 'uzytkownicy'" (navigateTo)="setActiveView($event)"></app-users>
       <app-group-users *ngIf="activeView === 'group-users'"></app-group-users>
       <app-classes *ngIf="activeView === 'przedmioty'"></app-classes>
+      <app-schedule *ngIf="activeView === 'plan'"></app-schedule>
     </div>
 
   </div>

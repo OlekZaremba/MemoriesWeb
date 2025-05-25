@@ -10,6 +10,7 @@ import {GroupGradesComponent} from '../group-grades/group-grades.component';
 import {UsersComponent} from '../users/users.component';
 import {GroupUsersComponent} from '../group-users/group-users.component';
 import {ClassesComponent} from '../classes/classes.component';
+import {ScheduleComponent} from '../schedule/schedule.component';
 
 @Component({
   selector: 'app-homepage',
@@ -25,7 +26,8 @@ import {ClassesComponent} from '../classes/classes.component';
     GroupGradesComponent,
     UsersComponent,
     GroupUsersComponent,
-    ClassesComponent
+    ClassesComponent,
+    ScheduleComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'
