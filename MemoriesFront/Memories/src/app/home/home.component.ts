@@ -13,4 +13,12 @@ export class HomeComponent {
   goToGrades() {
     this.navigateTo.emit('oceny');
   }
+
+  goToUsers() {
+    this.navigateTo.emit('uzytkownicy');
+  }
+
+  goToSummary() {
+    this.navigateTo.emit('wykresy');
+  }
 }
