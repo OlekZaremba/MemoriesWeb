@@ -149,3 +149,30 @@
   align-items: center;
   gap: 1rem;
 }
+
+.schedule-list {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lesson-item {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  background-color: #fff;
+  font-size: 1rem;
+}
+
+.lesson-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.teacher {
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
