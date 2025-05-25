@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace MemoriesBack.Entities
 {
@@ -9,8 +10,13 @@ namespace MemoriesBack.Entities
     {
         public enum Role
         {
+            [EnumMember(Value = "T")]
             T, // Teacher
+
+            [EnumMember(Value = "A")]
             A, // Admin
+
+            [EnumMember(Value = "S")]
             S  // Student
         }
 
@@ -30,8 +36,7 @@ namespace MemoriesBack.Entities
         public Role UserRole { get; set; }
 
         [Column("image", TypeName = "LONGBLOB")]
-        public byte[] Image { get; set; }
-
+        public byte[]? Image { get; set; }
 
         public ICollection<Grade> ReceivedGrades { get; set; }
 

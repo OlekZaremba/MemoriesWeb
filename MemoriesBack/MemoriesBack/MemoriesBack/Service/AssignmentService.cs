@@ -44,14 +44,27 @@ namespace MemoriesBack.Service
         {
             var groupMembers = await _groupMemberRepo.GetByUserGroupIdAsync(groupId);
             var gm = groupMembers.FirstOrDefault(g => g.UserId == teacherId)
-                ?? throw new ArgumentException("Nauczyciel nie należy do tej grupy");
+                     ?? throw new ArgumentException("Nauczyciel nie należy do tej grupy");
 
             var subject = await _classRepo.GetByIdAsync(classId)
-                ?? throw new ArgumentException("Nie znaleziono przedmiotu");
+                          ?? throw new ArgumentException("Nie znaleziono przedmiotu");
+            
+            var existingLinks = await _gmClassRepo.GetAllByGroupMemberIdAsync(gm.Id);
+            if (existingLinks.Any(l => l.SchoolClassId == subject.Id))
+            {
+                throw new InvalidOperationException("To przypisanie już istnieje.");
+            }
 
-            var link = new GroupMemberClass { GroupMember = gm, GroupMemberId = gm.Id, SchoolClass = subject, SchoolClassId = subject.Id };
+            var link = new GroupMemberClass
+            {
+                GroupMember = gm,
+                GroupMemberId = gm.Id,
+                SchoolClass = subject,
+                SchoolClassId = subject.Id
+            };
             await _gmClassRepo.AddAsync(link);
         }
+
 
         public async Task<List<SchoolClass>> GetAssignedClassesAsync(int teacherId, int groupId)
         {

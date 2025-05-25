@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MemoriesBack.Entities;
+using System;
 
 namespace MemoriesBack.Data
 {
@@ -17,10 +19,19 @@ namespace MemoriesBack.Data
         public DbSet<SensitiveData> SensitiveData { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Konwerter ról: enum <-> string
+            var roleConverter = new ValueConverter<User.Role, string>(
+                v => v.ToString(),                     
+                v => Enum.Parse<User.Role>(v)         
+            );
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.UserRole)
+                .HasConversion(roleConverter);
 
             modelBuilder.Entity<Grade>()
                 .HasOne(g => g.Student)

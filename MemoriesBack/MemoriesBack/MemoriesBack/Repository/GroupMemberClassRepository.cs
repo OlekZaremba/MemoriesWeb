@@ -19,9 +19,11 @@ namespace MemoriesBack.Repository
         public async Task<List<GroupMemberClass>> GetAllByGroupMemberIdAsync(int groupMemberId)
         {
             return await _context.GroupMemberClasses
+                .Include(gmc => gmc.SchoolClass)
                 .Where(gmc => gmc.GroupMemberId == groupMemberId)
                 .ToListAsync();
         }
+        
 
         public async Task<List<GroupMemberClass>> GetByGroupIdAsync(int groupId)
         {
@@ -70,8 +72,7 @@ namespace MemoriesBack.Repository
                 .Include(gmc => gmc.SchoolClass)
                 .FirstOrDefaultAsync(gmc => gmc.Id == id);
         }
-
-        // NOWA METODA
+        
         public async Task AddAsync(GroupMemberClass entity)
         {
             await _context.GroupMemberClasses.AddAsync(entity);
