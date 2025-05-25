@@ -9,6 +9,7 @@ import {AddGradeComponent} from '../add-grade/add-grade.component';
 import {GroupGradesComponent} from '../group-grades/group-grades.component';
 import {UsersComponent} from '../users/users.component';
 import {GroupUsersComponent} from '../group-users/group-users.component';
+import {ClassesComponent} from '../classes/classes.component';
 
 @Component({
   selector: 'app-homepage',
@@ -23,7 +24,8 @@ import {GroupUsersComponent} from '../group-users/group-users.component';
     AddGradeComponent,
     GroupGradesComponent,
     UsersComponent,
-    GroupUsersComponent
+    GroupUsersComponent,
+    ClassesComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'

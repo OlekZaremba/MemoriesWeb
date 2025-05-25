@@ -15,7 +15,8 @@
       <app-group-grades *ngIf="activeView === 'group-grades'"></app-group-grades>
       <app-users *ngIf="activeView === 'uzytkownicy'" (navigateTo)="setActiveView($event)"></app-users>
       <app-group-users *ngIf="activeView === 'group-users'"></app-group-users>
+      <app-classes *ngIf="activeView === 'przedmioty'"></app-classes>
     </div>
 
-    </div>
+  </div>
 </div>

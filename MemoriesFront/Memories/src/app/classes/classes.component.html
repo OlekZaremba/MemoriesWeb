@@ -1,0 +1,75 @@
+<div class="main">
+  <div class="content">
+    <div class="grades">
+      <div class="tile ">
+        <h2>Przedmioty</h2>
+        <!--    KOM DLA ADIEGO: Ogólnie to przedmioty są tylko widoczne dla admina, jak nie jesteś adminem to z tego paska po lewej też niech to nie będzie widoczne -->
+        <div class="teacher-control-buttons">
+          <button (click)="openAddSubjectModal()">Dodaj przedmiot</button>
+        </div>
+        <div class="student-grades-table">
+          <table class="subjects-table">
+            <thead>
+            <tr>
+              <th>Przedmiot</th>
+              <th>Przypisani nauczyciele</th>
+              <th>Przypisz nauczyciela</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Matematyka</td>
+              <td>Brak przypisań</td>
+              <td><button class="goToGrade" (click)="openAssignTeacherModal()">Przypisz</button></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Dodaj przedmiot -->
+<div class="modal-backdrop" *ngIf="showAddSubjectModal">
+  <div class="modal">
+    <h2>Dodaj przedmiot</h2>
+
+    <label for="subjectName">Nazwa przedmiotu:</label>
+    <input
+      id="subjectName"
+      type="text"
+      [(ngModel)]="newSubjectName"
+      placeholder="Wpisz nazwę przedmiotu"
+    />
+
+    <div class="modal-buttons">
+      <button (click)="addSubject()">Zapisz</button>
+      <button (click)="closeAddSubjectModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Przypisz nauczyciela -->
+<div class="modal-backdrop" *ngIf="showAssignTeacherModal">
+  <div class="modal">
+    <h2>Przypisz nauczycieli</h2>
+
+    <label>Wybierz nauczycieli:</label>
+    <label *ngFor="let teacher of availableTeachers" class="checkbox-row">
+      <input
+        type="checkbox"
+        [checked]="selectedTeachers.includes(teacher)"
+        #cb
+        (change)="toggleTeacher(teacher, cb.checked)"
+      />
+      {{ teacher }}
+    </label>
+
+    <div class="modal-buttons">
+      <button (click)="assignTeachers()">Zapisz</button>
+      <button (click)="closeAssignTeacherModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
