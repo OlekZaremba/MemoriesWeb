@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Maj 26, 2025 at 12:37 PM
+-- Generation Time: Maj 26, 2025 at 01:46 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -37,7 +37,8 @@ CREATE TABLE `class` (
 --
 
 INSERT INTO `class` (`idclass`, `class_name`) VALUES
-(1, 'Geografia 1');
+(1, 'Geografia 1'),
+(2, 'Historia 1');
 
 -- --------------------------------------------------------
 
@@ -83,7 +84,8 @@ CREATE TABLE `group_members` (
 INSERT INTO `group_members` (`idgroup_members`, `user_group_id`, `users_idusers`) VALUES
 (1, 1, 1),
 (5, 1, 2),
-(7, 1, 3);
+(7, 1, 3),
+(8, 1, 4);
 
 -- --------------------------------------------------------
 
@@ -103,6 +105,7 @@ CREATE TABLE `group_members_has_class` (
 
 INSERT INTO `group_members_has_class` (`id`, `group_members_idgroup_members`, `class_idclass`) VALUES
 (1, 1, 1),
+(7, 1, 2),
 (5, 5, 1),
 (6, 7, 1);
 
@@ -148,7 +151,8 @@ CREATE TABLE `sensitive_data` (
 INSERT INTO `sensitive_data` (`idsensitive_data`, `login`, `password`, `users_idusers`) VALUES
 (1, 'student', 'AQAAAAIAAYagAAAAEOJMmQpDHjjOZlJM5Ei/cTREyajn48tY/ZeEmnBTDeFp3bS7BgLYgr91voYW2hyIaQ==', 1),
 (2, 'teacher', 'AQAAAAIAAYagAAAAEEvodAO1C+u6od4BVI4EzJ1K/ei4E5Qlq+kVHHw96Vu/13mGlLDlBv4NQiZaGcgihA==', 2),
-(3, 'admin', 'AQAAAAIAAYagAAAAENbPCiM7ungdNXQ8HFGjFPf9NPbQHM/Jrru5J4FxytNYF4gN4z4Zq4wtDdidnaj7Fg==', 3);
+(3, 'admin', 'AQAAAAIAAYagAAAAENbPCiM7ungdNXQ8HFGjFPf9NPbQHM/Jrru5J4FxytNYF4gN4z4Zq4wtDdidnaj7Fg==', 3),
+(4, 'ruanrashmir', 'AQAAAAIAAYagAAAAEEzSHM9EirrY0b2wAB0vQJxjVDdeeD/iCl9u0S4/eG6U/Sc2sdPJCBcNJlFYok23Ew==', 4);
 
 -- --------------------------------------------------------
 
@@ -161,17 +165,19 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `surname` varchar(255) NOT NULL,
   `role` varchar(1) DEFAULT NULL,
-  `image` text DEFAULT NULL
+  `image` text DEFAULT NULL,
+  `email` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`idusers`, `name`, `surname`, `role`, `image`) VALUES
-(1, 'Anna', 'Kowalska', 'S', NULL),
-(2, 'Tomasz', 'Nowak', 'T', NULL),
-(3, 'Barbara', 'Wiśniewska', 'A', NULL);
+INSERT INTO `users` (`idusers`, `name`, `surname`, `role`, `image`, `email`) VALUES
+(1, 'Anna', 'Kowalska', 'S', NULL, 'anna@student.com'),
+(2, 'Tomasz', 'Nowak', 'T', NULL, 'tomasz@teacher.com'),
+(3, 'Barbara', 'Wiśniewska', 'A', NULL, 'barbara@admin.com'),
+(4, 'ruan', 'rashmir', 'S', NULL, 'ruanrashmir@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -278,7 +284,7 @@ ALTER TABLE `__efmigrationshistory`
 -- AUTO_INCREMENT for table `class`
 --
 ALTER TABLE `class`
-  MODIFY `idclass` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `idclass` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `grades`
@@ -290,13 +296,13 @@ ALTER TABLE `grades`
 -- AUTO_INCREMENT for table `group_members`
 --
 ALTER TABLE `group_members`
-  MODIFY `idgroup_members` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `idgroup_members` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `group_members_has_class`
 --
 ALTER TABLE `group_members_has_class`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `schedule`
@@ -308,13 +314,13 @@ ALTER TABLE `schedule`
 -- AUTO_INCREMENT for table `sensitive_data`
 --
 ALTER TABLE `sensitive_data`
-  MODIFY `idsensitive_data` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idsensitive_data` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `idusers` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idusers` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `user_group`
