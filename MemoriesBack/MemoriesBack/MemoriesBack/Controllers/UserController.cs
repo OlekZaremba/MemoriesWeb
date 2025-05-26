@@ -87,7 +87,6 @@ namespace MemoriesBack.Controller
 
             return Ok(dtos);
         }
-
         [HttpGet]
         public async Task<ActionResult<List<UserDTO>>> GetAllUsers()
         {
