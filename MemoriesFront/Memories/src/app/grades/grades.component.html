@@ -1,15 +1,38 @@
 <div class="main">
   <div class="content">
     <div class="grades">
-      <div class="tile ">
+      <div class="tile">
         <h2>Oceny</h2>
 
-        <!-- 🔒 Przycisk widoczny tylko dla nauczyciela -->
-        <div class="teacher-control-buttons" *ngIf="userRole === 'T'">
-          <button (click)="goToAddGrade()">Dodaj ocenę</button>
-        </div>
+        <!-- 🔒 Sekcja tylko dla nauczyciela -->
+        <ng-container *ngIf="userRole === 'T'">
+          <div class="teacher-control-buttons">
+            <button (click)="goToAddGrade()">Dodaj ocenę</button>
+          </div>
 
-        <!-- 📚 Tabela ocen ucznia – tylko dla ucznia -->
+          <table class="subjects-table" *ngIf="teacherGroups.length > 0">
+            <thead>
+            <tr>
+              <th>Klasa</th>
+              <th>Akcja</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let group of teacherGroups">
+              <td>{{ group.groupName }}</td>
+              <td>
+                <button class="goToGrade" (click)="goToGroupGrades(group.id)">Przeglądaj oceny</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <p *ngIf="teacherGroups.length === 0" style="margin-top: 1rem; font-size: 1rem;">
+            Nie przypisano Cię jeszcze do żadnej klasy.
+          </p>
+        </ng-container>
+
+        <!-- 👨‍🎓 Sekcja tylko dla ucznia -->
         <div class="student-grades-table" *ngIf="userRole === 'S'">
           <table class="subjects-table">
             <thead>
@@ -24,28 +47,6 @@
               <td>Matematyka</td>
               <td>3.00</td>
               <td><button class="goToGrade" (click)="goToGradeView()">Przejdź</button></td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- 🧑‍🏫 Sekcja nauczyciela -->
-        <div class="student-grades-table" *ngIf="userRole === 'T'">
-          <table class="subjects-table">
-            <thead>
-            <tr>
-              <th>Klasa</th>
-              <th>Akcja</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>Klasa 1</td>
-              <td><button class="goToGrade" (click)="goToGroupGrades()">Przeglądaj oceny</button></td>
-            </tr>
-            <tr>
-              <td>Klasa 2</td>
-              <td><button class="goToGrade" (click)="goToGroupGrades()">Przeglądaj oceny</button></td>
             </tr>
             </tbody>
           </table>

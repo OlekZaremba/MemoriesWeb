@@ -54,6 +54,9 @@ namespace MemoriesBack
             builder.Services.AddScoped<PasswordResetService>();
             builder.Services.AddScoped<EmailService>();
             builder.Services.AddScoped<AssignmentService>();
+            builder.Services.AddScoped<UserGroupService>();
+            builder.Services.AddScoped<GroupMemberClassService>();
+
 
             builder.Services.Configure<FormOptions>(options =>
             {

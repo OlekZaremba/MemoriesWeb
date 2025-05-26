@@ -2,28 +2,26 @@
   <div class="tile">
     <h2>Wybierz grupę</h2>
     <div class="student-grades-table">
-      <div class="student-grades-table">
-      <!--    KOM DLA ADIEGO: TUTAJ MAJĄ SIĘ ŁADOWAĆ KLASY KTÓRE MA NAUCZYCIEL-->
-        <table class="subjects-table">
-          <thead>
-          <tr>
-            <th>Grupa</th>
-            <th>Akcja</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>Klasa 1</td>
-            <td><button class="addGrade" (click)="openModal()">Dodaj ocenę</button></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="subjects-table">
+        <thead>
+        <tr>
+          <th>Grupa</th>
+          <th>Akcja</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let group of groups">
+          <td>{{ group.groupName }}</td>
+          <td>
+            <button class="addGrade" (click)="openModal(group.id)">Dodaj ocenę</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
-<!--    KOM DLA ADIEGO: TUTAJ TWORZY SIĘ MODAL CZYLI POPUP, POWINIEN ŁADOWAĆ UCZNIÓW Z DANEJ WYBRANEJ KLASY I WSTAWIAĆ JE DO LISTY I ZAPISYWAĆ DLA DANEGO UCZNIA-->
 <!-- Modal -->
 <div class="modal-backdrop" *ngIf="showModal">
   <div class="modal">
