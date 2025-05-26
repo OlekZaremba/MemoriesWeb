@@ -44,15 +44,18 @@ namespace MemoriesBack.Controller
                 return BadRequest("Brak obrazu");
             }
             
+            var base64Only = b64.Contains("base64,") ? b64.Split(",")[1] : b64;
+
             try
             {
-                _ = Convert.FromBase64String(b64); // tylko walidacja
-                user.Image = b64; // zapisujemy jako string
+                _ = Convert.FromBase64String(base64Only); 
+                user.Image = b64; 
             }
             catch
             {
                 return BadRequest("Nieprawidłowy format obrazu");
             }
+
 
 
             await _userRepo.UpdateAsync(user);
@@ -139,5 +142,18 @@ namespace MemoriesBack.Controller
 
             return Ok("Użytkownik zaktualizowany");
         }
+        
+        [HttpGet("{id}/profile-image")]
+        public async Task<IActionResult> GetProfileImage(int id)
+        {
+            var user = await _userRepo.GetByIdAsync(id);
+            if (user == null)
+                return NotFound("Nie znaleziono użytkownika");
+
+            var base64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
+
+            return Ok(new { image = base64 });
+        }
+
     }
 }

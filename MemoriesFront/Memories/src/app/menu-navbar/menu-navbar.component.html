@@ -1,18 +1,26 @@
-<div class="menu">
+<div class="menu" *ngIf="userName">
   <div class="menu-content">
     <div class="logo-box">
-      <a href="/homepage">
-        <img src="/logo-long.png">
+      <a routerLink="/homepage">
+        <img src="/logo-long.png" alt="Logo">
       </a>
     </div>
+
     <div class="profile-section">
-      <img src="/photo-camera.png" alt="">
+      <label for="fileInput" style="cursor: pointer;">
+        <img src="/photo-camera.png" alt="Dodaj zdjęcie" />
+      </label>
+      <input type="file" id="fileInput" accept="image/*" (change)="onFileSelected($event)" hidden />
+
       <div class="menu-button profile-button">
-        <button></button>
+        <button #profileBtn></button>
       </div>
+
       <div class="details">
-        <h3>Jakub Bonczyk</h3>
-        <p>Uczeń</p>
+        <h3>{{ userName }}</h3>
+        <p *ngIf="userRole === 'S'">Uczeń</p>
+        <p *ngIf="userRole === 'T'">Nauczyciel</p>
+        <p *ngIf="userRole === 'A'">Administrator</p>
       </div>
     </div>
   </div>
