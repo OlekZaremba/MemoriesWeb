@@ -3,11 +3,14 @@
     <div class="grades">
       <div class="tile ">
         <h2>Oceny</h2>
-<!--    KOM DLA ADIEGO: CAŁY TEN DIV MA ZNIKNĄĆ, JEŻELI ROLA != NAUCZYCIEL-->
-        <div class="teacher-control-buttons"><button (click)="goToAddGrade()">Dodaj ocenę</button></div>
-<!--        TABELA OCEN DLA UCZNIÓW!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
-        <div class="student-grades-table">
-<!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ PRZEDMIOTY DYNAMICZNIE Z BAZY DANYCH I ICH ŚREDNIA-->
+
+        <!-- 🔒 Przycisk widoczny tylko dla nauczyciela -->
+        <div class="teacher-control-buttons" *ngIf="userRole === 'T'">
+          <button (click)="goToAddGrade()">Dodaj ocenę</button>
+        </div>
+
+        <!-- 📚 Tabela ocen ucznia – tylko dla ucznia -->
+        <div class="student-grades-table" *ngIf="userRole === 'S'">
           <table class="subjects-table">
             <thead>
             <tr>
@@ -26,14 +29,8 @@
           </table>
         </div>
 
-
-        <!--        TABELA OCEN DLA NAUCZYCIELI!!!!!!!!-->
-
-        <br>
-        tu sekcja nauczycieli - chować w zależności od roli
-
-        <div class="student-grades-table">
-          <!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ PRZEDMIOTY DYNAMICZNIE Z BAZY DANYCH I ICH ŚREDNIA-->
+        <!-- 🧑‍🏫 Sekcja nauczyciela -->
+        <div class="student-grades-table" *ngIf="userRole === 'T'">
           <table class="subjects-table">
             <thead>
             <tr>
@@ -53,6 +50,7 @@
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   </div>
