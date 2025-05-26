@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Maj 26, 2025 at 01:46 PM
+-- Generation Time: Maj 26, 2025 at 02:21 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -140,6 +140,7 @@ INSERT INTO `schedule` (`idschedule`, `lesson_date`, `start_time`, `end_time`, `
 CREATE TABLE `sensitive_data` (
   `idsensitive_data` int(11) NOT NULL,
   `login` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `password` varchar(256) NOT NULL,
   `users_idusers` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -148,11 +149,11 @@ CREATE TABLE `sensitive_data` (
 -- Dumping data for table `sensitive_data`
 --
 
-INSERT INTO `sensitive_data` (`idsensitive_data`, `login`, `password`, `users_idusers`) VALUES
-(1, 'student', 'AQAAAAIAAYagAAAAEOJMmQpDHjjOZlJM5Ei/cTREyajn48tY/ZeEmnBTDeFp3bS7BgLYgr91voYW2hyIaQ==', 1),
-(2, 'teacher', 'AQAAAAIAAYagAAAAEEvodAO1C+u6od4BVI4EzJ1K/ei4E5Qlq+kVHHw96Vu/13mGlLDlBv4NQiZaGcgihA==', 2),
-(3, 'admin', 'AQAAAAIAAYagAAAAENbPCiM7ungdNXQ8HFGjFPf9NPbQHM/Jrru5J4FxytNYF4gN4z4Zq4wtDdidnaj7Fg==', 3),
-(4, 'ruanrashmir', 'AQAAAAIAAYagAAAAEEzSHM9EirrY0b2wAB0vQJxjVDdeeD/iCl9u0S4/eG6U/Sc2sdPJCBcNJlFYok23Ew==', 4);
+INSERT INTO `sensitive_data` (`idsensitive_data`, `login`, `email`, `password`, `users_idusers`) VALUES
+(1, 'student', 'anna@student.com', 'AQAAAAIAAYagAAAAEOJMmQpDHjjOZlJM5Ei/cTREyajn48tY/ZeEmnBTDeFp3bS7BgLYgr91voYW2hyIaQ==', 1),
+(2, 'teacher', 'tomasz@teacher.com', 'AQAAAAIAAYagAAAAEEvodAO1C+u6od4BVI4EzJ1K/ei4E5Qlq+kVHHw96Vu/13mGlLDlBv4NQiZaGcgihA==', 2),
+(3, 'admin', 'barbara@admin.com', 'AQAAAAIAAYagAAAAENbPCiM7ungdNXQ8HFGjFPf9NPbQHM/Jrru5J4FxytNYF4gN4z4Zq4wtDdidnaj7Fg==', 3),
+(4, 'ruanrashmir', 'ruanrashmir@gmail.com', 'AQAAAAIAAYagAAAAEEzSHM9EirrY0b2wAB0vQJxjVDdeeD/iCl9u0S4/eG6U/Sc2sdPJCBcNJlFYok23Ew==', 4);
 
 -- --------------------------------------------------------
 
@@ -165,19 +166,18 @@ CREATE TABLE `users` (
   `name` varchar(255) NOT NULL,
   `surname` varchar(255) NOT NULL,
   `role` varchar(1) DEFAULT NULL,
-  `image` text DEFAULT NULL,
-  `email` varchar(255) NOT NULL DEFAULT ''
+  `image` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`idusers`, `name`, `surname`, `role`, `image`, `email`) VALUES
-(1, 'Anna', 'Kowalska', 'S', NULL, 'anna@student.com'),
-(2, 'Tomasz', 'Nowak', 'T', NULL, 'tomasz@teacher.com'),
-(3, 'Barbara', 'Wiśniewska', 'A', NULL, 'barbara@admin.com'),
-(4, 'ruan', 'rashmir', 'S', NULL, 'ruanrashmir@gmail.com');
+INSERT INTO `users` (`idusers`, `name`, `surname`, `role`, `image`) VALUES
+(1, 'Anna', 'Kowalska', 'S', NULL),
+(2, 'Tomasz', 'Nowak', 'T', NULL),
+(3, 'Barbara', 'Wiśniewska', 'A', NULL),
+(4, 'ruan', 'rashmir', 'S', NULL);
 
 -- --------------------------------------------------------
 
