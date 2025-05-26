@@ -70,7 +70,6 @@ namespace MemoriesBack.Service
             {
                 Name = request.Name,
                 Surname = request.Surname,
-                Email = request.Email, 
                 UserRole = request.Role
             };
 

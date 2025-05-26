@@ -17,7 +17,11 @@ namespace MemoriesBack.Entities
         [Required]
         [MaxLength(256)]
         public string Password { get; set; }
+        
+        [Column("email")]
+        public string Email { get; set; }
 
+        
         [Required]
         [ForeignKey("UserId")]
         [Column("users_idusers")]

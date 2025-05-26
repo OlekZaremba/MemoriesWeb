@@ -82,6 +82,7 @@ namespace MemoriesBack
     
             app.UseCors("AllowAngularApp");
             app.UseRouting();
+            app.UseStaticFiles();
             app.UseAuthorization();
             app.MapControllers();
             app.Run();

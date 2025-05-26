@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using MemoriesBack.Entities;
@@ -8,65 +9,60 @@ namespace MemoriesBack.Service
 {
     public class PasswordResetService
     {
-        private readonly UserRepository _userRepository;
         private readonly SensitiveDataRepository _sensitiveDataRepository;
-        private readonly PasswordResetTokenRepository _tokenRepository;
         private readonly EmailService _emailService;
         private readonly IPasswordHasher<User> _passwordHasher;
 
+        // Tymczasowy magazyn tokenów (token -> SensitiveData)
+        private static readonly ConcurrentDictionary<string, SensitiveData> ResetTokens = new();
+
         public PasswordResetService(
-            UserRepository userRepository,
             SensitiveDataRepository sensitiveDataRepository,
-            PasswordResetTokenRepository tokenRepository,
             EmailService emailService,
             IPasswordHasher<User> passwordHasher)
         {
-            _userRepository = userRepository;
             _sensitiveDataRepository = sensitiveDataRepository;
-            _tokenRepository = tokenRepository;
             _emailService = emailService;
             _passwordHasher = passwordHasher;
         }
 
-        public async Task RequestPasswordReset(string login)
+        public async Task RequestPasswordReset(string email)
         {
-            var sensitive = await _sensitiveDataRepository.GetByLoginAsync(login);
-            if (sensitive == null) return;
+            var sensitive = await _sensitiveDataRepository.GetByEmailAsync(email);
+            if (sensitive == null)
+            {
+                Console.WriteLine("Użytkownik o takim e-mailu nie istnieje.");
+                return;
+            }
 
             var token = Guid.NewGuid().ToString();
-            var expiry = DateTime.UtcNow.AddMinutes(30);
+            ResetTokens[token] = sensitive;
 
-            var resetToken = new PasswordResetToken
+            try
             {
-                Token = token,
-                User = sensitive.User,
-                ExpiryDate = expiry
-            };
-
-            await _tokenRepository.AddAsync(resetToken);
-            await _emailService.SendPasswordResetEmailAsync(login, token);
+                Console.WriteLine($"[RESET] Token dla {email}: {token}");
+                await _emailService.SendPasswordResetEmailAsync(email, token);
+                Console.WriteLine("E-mail z linkiem resetującym został wysłany.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Błąd przy wysyłaniu e-maila: {ex.Message}");
+            }
         }
 
         public async Task<bool> ResetPassword(string token, string newPassword)
         {
-            var resetToken = await _tokenRepository.GetByTokenAsync(token);
-            if (resetToken == null) return false;
-
-            if (resetToken.ExpiryDate < DateTime.UtcNow)
+            if (!ResetTokens.TryRemove(token, out var sensitiveData))
             {
-                await _tokenRepository.DeleteAsync(resetToken);
+                Console.WriteLine("Nieprawidłowy lub zużyty token.");
                 return false;
             }
 
-            var user = resetToken.User;
-            var sensitiveData = await _sensitiveDataRepository.GetByUserAsync(user);
-            if (sensitiveData == null)
-                throw new InvalidOperationException("Brak danych logowania");
-
+            var user = sensitiveData.User;
             sensitiveData.Password = _passwordHasher.HashPassword(user, newPassword);
             await _sensitiveDataRepository.UpdateAsync(sensitiveData);
-            await _tokenRepository.DeleteAsync(resetToken);
 
+            Console.WriteLine($"Hasło zaktualizowane dla użytkownika: {sensitiveData.Login}");
             return true;
         }
     }

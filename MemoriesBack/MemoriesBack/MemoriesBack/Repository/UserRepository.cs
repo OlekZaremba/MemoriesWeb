@@ -25,7 +25,14 @@ namespace MemoriesBack.Repository
         {
             return await _context.Users.FindAsync(id);
         }
-
+        
+        public async Task<SensitiveData?> GetByEmailAsync(string email)
+        {
+            return await _context.SensitiveData
+                .Include(sd => sd.User)
+                .FirstOrDefaultAsync(sd => sd.Email == email);
+        }
+        
         public async Task<List<User>> GetByRoleAsync(User.Role role)
         {
             return await _context.Users

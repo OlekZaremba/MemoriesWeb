@@ -23,7 +23,7 @@ namespace MemoriesBack.Service
             var sender = settings["Sender"];
             var enableSsl = bool.Parse(settings["EnableSsl"]);
 
-            string resetUrl = $"http://localhost:8080/reset-password.html?token={token}";
+            string resetUrl = $"http://localhost:5017/reset-password.html?token={token}";
             string subject = "Resetowanie hasła";
             string body = $"Kliknij poniższy link, aby zresetować hasło:\n{resetUrl}";
 
@@ -40,8 +40,18 @@ namespace MemoriesBack.Service
                 EnableSsl = enableSsl,
                 Credentials = new NetworkCredential(username, password)
             };
+            
+            try
+            {
+                await smtp.SendMailAsync(message);
+                Console.WriteLine("Wysłano e-mail pomyślnie.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Błąd przy wysyłce e-maila: {ex.Message}");
+                throw;
+            }
 
-            await smtp.SendMailAsync(message);
         }
     }
 }

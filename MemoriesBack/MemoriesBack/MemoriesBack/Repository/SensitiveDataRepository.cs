@@ -17,10 +17,17 @@ namespace MemoriesBack.Repository
         public async Task<SensitiveData?> GetByLoginAsync(string login)
         {
             return await _context.SensitiveData
-                .Include(s => s.User) 
+                .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.Login == login);
         }
-        
+
+        public async Task<SensitiveData?> GetByEmailAsync(string email)
+        {
+            return await _context.SensitiveData
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.Email == email);
+        }
+
         public async Task<SensitiveData?> GetByUserAsync(User user)
         {
             return await _context.SensitiveData
@@ -44,6 +51,5 @@ namespace MemoriesBack.Repository
             _context.SensitiveData.Remove(data);
             await _context.SaveChangesAsync();
         }
-        
     }
 }

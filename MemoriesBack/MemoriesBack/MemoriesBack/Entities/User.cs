@@ -32,11 +32,6 @@ namespace MemoriesBack.Entities
         public string Surname { get; set; }
 
         [Required]
-        [EmailAddress]
-        [Column("email")]
-        public string Email { get; set; }
-
-        [Required]
         [Column("role")]
         public Role UserRole { get; set; }
 
