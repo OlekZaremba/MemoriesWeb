@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using MemoriesBack.DTO;
 using MemoriesBack.Service;
 
-namespace MemoriesBack.Controller
+namespace MemoriesBack.Controllers
 {
     [ApiController]
     [Route("api/auth")]

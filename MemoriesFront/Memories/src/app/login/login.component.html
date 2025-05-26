@@ -1,13 +1,20 @@
 <div class="container">
-  <div class="logo"><img src="logo-white.png" height="150px"></div>
+  <div class="logo">
+    <img src="logo-white.png" height="150px">
+  </div>
+
   <div class="inputs">
     <h3>Zaloguj się do systemu Memories++</h3>
-    <input type="text" placeholder="Login">
-    <input type="password" placeholder="Hasło">
+
+    <input type="text" placeholder="Login" [(ngModel)]="email">
+    <input type="password" placeholder="Hasło" [(ngModel)]="password">
+
     <div class="buttons">
-      <button routerLink="/homepage">Zaloguj się</button>
+      <button (click)="login()">Zaloguj się</button>
       <button routerLink="/register">Odzyskaj hasło</button>
     </div>
+
+    <span *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</span>
     <span>Formularz logowania przeznaczony jest zarówno dla uczniów, jak i nauczycieli</span>
   </div>
 </div>

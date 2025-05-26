@@ -43,15 +43,17 @@ namespace MemoriesBack.Controller
             {
                 return BadRequest("Brak obrazu");
             }
-
+            
             try
             {
-                user.Image = Convert.FromBase64String(b64);
+                _ = Convert.FromBase64String(b64); // tylko walidacja
+                user.Image = b64; // zapisujemy jako string
             }
             catch
             {
                 return BadRequest("Nieprawidłowy format obrazu");
             }
+
 
             await _userRepo.UpdateAsync(user);
             return Ok();
@@ -103,9 +105,8 @@ namespace MemoriesBack.Controller
             var sensitive = await _sensitiveRepo.GetByUserAsync(user)
                 ?? throw new ArgumentException("Brak danych wrażliwych");
 
-            var imageBase64 = user.Image != null
-                ? Convert.ToBase64String(user.Image)
-                : "";
+            var imageBase64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
+
 
             var dto = new EditUserResponse(
                 user.Id,
