@@ -11,13 +11,13 @@ namespace MemoriesBack.Entities
         public enum Role
         {
             [EnumMember(Value = "T")]
-            T, // Teacher
+            T, 
 
             [EnumMember(Value = "A")]
-            A, // Admin
+            A, 
 
             [EnumMember(Value = "S")]
-            S  // Student
+            S  
         }
 
         [Key]
@@ -32,12 +32,16 @@ namespace MemoriesBack.Entities
         public string Surname { get; set; }
 
         [Required]
+        [EmailAddress]
+        [Column("email")]
+        public string Email { get; set; }
+
+        [Required]
         [Column("role")]
         public Role UserRole { get; set; }
 
         [Column("image", TypeName = "TEXT")]
         public string? Image { get; set; }
-
 
         public ICollection<Grade> ReceivedGrades { get; set; }
 
@@ -47,4 +51,5 @@ namespace MemoriesBack.Entities
 
         public ICollection<GroupMember> GroupMemberships { get; set; }
     }
+
 }

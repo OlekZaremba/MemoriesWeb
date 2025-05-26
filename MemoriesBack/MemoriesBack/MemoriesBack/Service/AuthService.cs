@@ -47,7 +47,7 @@ namespace MemoriesBack.Service
             var className = members != null && members.Count > 0 && members[0].UserGroup != null
                 ? members[0].UserGroup.GroupName
                 : null;
-            
+
             string imageBase64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
 
             return new LoginResponse(
@@ -60,7 +60,6 @@ namespace MemoriesBack.Service
             );
         }
 
-
         public async Task RegisterUser(RegisterUserRequest request)
         {
             var existing = await _sensitiveDataRepository.GetByLoginAsync(request.Login);
@@ -71,6 +70,7 @@ namespace MemoriesBack.Service
             {
                 Name = request.Name,
                 Surname = request.Surname,
+                Email = request.Email, 
                 UserRole = request.Role
             };
 

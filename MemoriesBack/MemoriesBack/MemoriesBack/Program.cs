@@ -5,6 +5,8 @@ using MemoriesBack.Repository;
 using MemoriesBack.Entities;
 using Microsoft.AspNetCore.Identity;
 using MemoriesBack.Service;
+using System.Text.Json.Serialization;
+
 
 namespace MemoriesBack
 {
@@ -29,6 +31,14 @@ namespace MemoriesBack
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
                 ));
+            
+            builder.Services
+                .AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
 
             builder.Services.AddScoped<GradeRepository>();
             builder.Services.AddScoped<GroupMemberClassRepository>();
