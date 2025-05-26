@@ -1,4 +1,3 @@
-
 # 📘 README – Baza danych `memories_net`
 
 ## 📌 Opis
@@ -10,23 +9,27 @@ Zawiera już dane testowe umożliwiające szybkie logowanie i pracę z systemem.
 
 ## 🧪 Domyślni użytkownicy
 
-| Login    | Hasło    | Rola           | Imię     | Nazwisko     |
-|----------|----------|----------------|----------|--------------|
-| student  | test123  | Uczeń (S)      | Anna     | Kowalska     |
-| teacher  | test123  | Nauczyciel (T) | Tomasz   | Nowak        |
-| admin    | test123  | Administrator (A) | Barbara | Wiśniewska |
+| Login    | Hasło    | Rola             | Imię     | Nazwisko     | Email                |
+|----------|----------|------------------|----------|--------------|----------------------|
+| student  | test123  | Uczeń (S)        | Anna     | Kowalska     | anna@student.com     |
+| teacher  | test123  | Nauczyciel (T)   | Tomasz   | Nowak        | tomasz@teacher.com   |
+| admin    | test123  | Administrator (A)| Barbara  | Wiśniewska   | barbara@admin.com    |
 
-Hasła zostały **poprawnie zahashowane** zgodnie z algorytmem .NET (ASP.NET Identity PasswordHasher).
+Hasła zostały **poprawnie zahashowane** zgodnie z algorytmem .NET (`ASP.NET Identity PasswordHasher`).
 
 ---
 
 ## 🗃️ Struktura danych
 
 ### 🧑‍🎓 `users`
-Dane osobowe i rola użytkownika (`S`, `T`, `A`)
+Dane osobowe użytkownika:
+- `name`, `surname` – imię i nazwisko
+- `role` – `S` (student), `T` (teacher), `A` (admin)
+- `image` – zdjęcie profilowe (opcjonalne)
+- `email` – adres e-mail (wymagany do odzyskiwania hasła)
 
 ### 🔐 `sensitive_data`
-Dane logowania i hasło użytkownika (hash)
+Dane logowania i hasło użytkownika (hashowane)
 
 ### 🧑‍🏫 `user_group`
 Grupy użytkowników (np. klasy)
@@ -35,7 +38,7 @@ Grupy użytkowników (np. klasy)
 Powiązanie użytkownika z grupą
 
 ### 📚 `class`
-Lista przedmiotów
+Lista przedmiotów (np. Geografia)
 
 ### 🧩 `group_members_has_class`
 Powiązanie członka grupy z przedmiotem
@@ -56,6 +59,7 @@ Oceny uczniów – domyślnie jedna ocena `5` za `Sprawdzian z mapy`
   "login": "student",
   "password": "test123"
 }
+
 ```
 
 ---
@@ -64,3 +68,4 @@ Oceny uczniów – domyślnie jedna ocena `5` za `Sprawdzian z mapy`
 - Baza została wyeksportowana z MySQL/MariaDB 10.4.32.
 - Wszystkie relacje i indeksy są poprawnie ustawione.
 - Nie jest wymagane resetowanie haseł po imporcie.
+- Kolumna email została dodana do tabeli users i jest wymagana przy rejestracji i resetowaniu hasła.
