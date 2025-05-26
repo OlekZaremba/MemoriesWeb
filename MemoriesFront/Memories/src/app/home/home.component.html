@@ -33,10 +33,22 @@
     <div class="schedule">
       <div class="tile content-tile">
         <h2>Harmonogram dnia</h2>
-        <div class="other-days">
-          <button>Zobacz inne dni</button>
+
+        <div class="schedule-list">
+          <div class="lesson-item" *ngFor="let lesson of getTodaysLessons()">
+            <div class="lesson-header">
+              <span class="subject">{{ lesson.subject }}</span>
+              <span class="time">{{ lesson.startTime }} – {{ lesson.endTime }}</span>
+            </div>
+            <div class="teacher">Prowadzący: {{ lesson.teacher }}</div>
+          </div>
         </div>
 
+        <div class="other-days">
+          <div class="other-days">
+            <button (click)="goToSchedule()">Zobacz inne dni</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -11,6 +11,7 @@ import {UsersComponent} from '../users/users.component';
 import {GroupUsersComponent} from '../group-users/group-users.component';
 import {ClassesComponent} from '../classes/classes.component';
 import {ScheduleComponent} from '../schedule/schedule.component';
+import {SummaryComponent} from '../summary/summary.component';
 
 @Component({
   selector: 'app-homepage',
@@ -27,7 +28,8 @@ import {ScheduleComponent} from '../schedule/schedule.component';
     UsersComponent,
     GroupUsersComponent,
     ClassesComponent,
-    ScheduleComponent
+    ScheduleComponent,
+    SummaryComponent
   ],
   templateUrl: './homepage.component.html',
   styleUrl: './homepage.component.css'
