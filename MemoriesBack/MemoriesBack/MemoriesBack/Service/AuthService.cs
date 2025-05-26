@@ -36,7 +36,7 @@ namespace MemoriesBack.Service
         public async Task<LoginResponse> Login(string login, string password)
         {
             var data = await _sensitiveDataRepository.GetByLoginAsync(login)
-                ?? throw new ArgumentException("Nieprawidłowy login");
+                       ?? throw new ArgumentException("Nieprawidłowy login");
 
             var user = data.User;
             var result = _passwordHasher.VerifyHashedPassword(user, data.Password, password);
@@ -47,8 +47,8 @@ namespace MemoriesBack.Service
             var className = members != null && members.Count > 0 && members[0].UserGroup != null
                 ? members[0].UserGroup.GroupName
                 : null;
-
-            string? imageBase64 = user.Image != null ? Convert.ToBase64String(user.Image) : null;
+            
+            string imageBase64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
 
             return new LoginResponse(
                 user.Id,
@@ -59,6 +59,7 @@ namespace MemoriesBack.Service
                 className
             );
         }
+
 
         public async Task RegisterUser(RegisterUserRequest request)
         {

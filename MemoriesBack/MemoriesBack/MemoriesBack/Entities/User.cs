@@ -35,8 +35,9 @@ namespace MemoriesBack.Entities
         [Column("role")]
         public Role UserRole { get; set; }
 
-        [Column("image", TypeName = "LONGBLOB")]
-        public byte[]? Image { get; set; }
+        [Column("image", TypeName = "TEXT")]
+        public string? Image { get; set; }
+
 
         public ICollection<Grade> ReceivedGrades { get; set; }
 

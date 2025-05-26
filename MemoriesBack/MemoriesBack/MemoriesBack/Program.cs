@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using MemoriesBack.Data;
-using System;
 using MemoriesBack.Repository;
 using MemoriesBack.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +13,16 @@ namespace MemoriesBack
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularApp", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseMySql(
@@ -35,8 +44,6 @@ namespace MemoriesBack
             builder.Services.AddScoped<PasswordResetService>();
             builder.Services.AddScoped<EmailService>();
             builder.Services.AddScoped<AssignmentService>();
-
-
 
             builder.Services.Configure<FormOptions>(options =>
             {
@@ -62,12 +69,9 @@ namespace MemoriesBack
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            
-            app.UseAuthorization(); 
-            
-            Console.WriteLine();
-
-
+    
+            app.UseCors("AllowAngularApp");
+            app.UseRouting();
             app.UseAuthorization();
             app.MapControllers();
             app.Run();
