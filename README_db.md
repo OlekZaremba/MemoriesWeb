@@ -26,10 +26,10 @@ Dane osobowe użytkownika:
 - `name`, `surname` – imię i nazwisko
 - `role` – `S` (student), `T` (teacher), `A` (admin)
 - `image` – zdjęcie profilowe (opcjonalne)
-- `email` – adres e-mail (wymagany do odzyskiwania hasła)
 
 ### 🔐 `sensitive_data`
 Dane logowania i hasło użytkownika (hashowane)
+- `email` – adres e-mail (wymagany do odzyskiwania hasła)
 
 ### 🧑‍🏫 `user_group`
 Grupy użytkowników (np. klasy)
