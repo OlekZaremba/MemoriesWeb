@@ -34,24 +34,32 @@
 
         <!-- Uczeń -->
         <ng-container *ngIf="userRole === 'S'">
-          <table class="subjects-table">
-            <thead>
-            <tr>
-              <th>Przedmiot</th>
-              <th>Średnia</th>
-              <th>Akcja</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let subject of studentSubjects">
-              <td>{{ subject.className }}</td>
-              <td>{{ subject.average | number:'1.2-2' }}</td>
-              <td>
-                <button class="goToGrade" (click)="goToGradeView(subject.id)">Przejdź</button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+          <ng-container *ngIf="!activeSubjectId">
+            <table class="subjects-table">
+              <thead>
+              <tr>
+                <th>Przedmiot</th>
+                <th>Średnia</th>
+                <th>Akcja</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let subject of studentSubjects">
+                <td>{{ subject.className }}</td>
+                <td>{{ subject.average | number:'1.2-2' }}</td>
+                <td>
+                  <button class="goToGrade" (click)="showSubjectGrades(subject.id)">Przejdź</button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </ng-container>
+
+          <!-- Szczegóły ocen dla przedmiotu -->
+          <ng-container *ngIf="activeSubjectId">
+            <button class="goToGrade" style="margin-bottom: 1rem;" (click)="closeSubjectGrades()">← Wróć</button>
+            <app-grade-view [subjectId]="activeSubjectId"></app-grade-view>
+          </ng-container>
         </ng-container>
 
         <!-- Administrator -->
@@ -60,7 +68,6 @@
             Widok administratora będzie dostępny wkrótce.
           </p>
         </ng-container>
-
       </div>
     </div>
   </div>

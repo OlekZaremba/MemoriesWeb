@@ -95,9 +95,11 @@ namespace MemoriesBack.Service
                     g.GradeValue,
                     g.Type ?? "",
                     g.IssueDate.ToString("yyyy-MM-dd"),
-                    g.SchoolClass?.ClassName ?? ""
+                    g.SchoolClass?.ClassName ?? "",
+                    g.Description ?? ""
                 ))
                 .ToList();
+
         }
 
         public async Task<GradeDetailDTO> GetGradeDetailsAsync(int gradeId)
@@ -202,7 +204,8 @@ namespace MemoriesBack.Service
                 g.GradeValue,
                 g.Type ?? "",
                 g.IssueDate.ToString("yyyy-MM-dd"),
-                g.SchoolClass?.ClassName ?? ""
+                g.SchoolClass?.ClassName ?? "",
+                g.Description ?? ""
             )).ToList();
         }
 
