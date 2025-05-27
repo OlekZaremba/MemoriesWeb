@@ -73,9 +73,9 @@ export class GradesComponent implements OnInit {
   }
 
   goToAddGrade() {
-    this.loadTeacherGroups();
-    this.router.navigate([`/add-grade`]);
+    this.navigateTo.emit('add-grade');
   }
+
 
   goToGroupGrades(groupId: number) {
     this.navigateTo.emit(`group-grades:${groupId}`);
