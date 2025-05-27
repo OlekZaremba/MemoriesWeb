@@ -14,13 +14,13 @@
         <tbody>
         <tr *ngFor="let student of students">
           <td>{{ student.name }} {{ student.surname }}</td>
-          <td>
-            <button
-              *ngFor="let grade of student.grades"
-              class="addGrade"
-              (click)="openModal(grade, student.name + ' ' + student.surname)">
-              {{ grade.value }}
-            </button>
+          <td class="grades-cell">
+              <span
+                *ngFor="let grade of student.grades"
+                class="grade-chip"
+                (click)="openModal(grade, student.name + ' ' + student.surname)">
+                {{ grade.value }}
+              </span>
           </td>
           <td>{{ student.average | number:'1.2-2' }}</td>
         </tr>
