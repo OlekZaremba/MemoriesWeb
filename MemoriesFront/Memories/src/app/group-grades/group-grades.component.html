@@ -1,6 +1,6 @@
 <div class="grades">
   <div class="tile">
-    <h2>Oceny uczniów - Klasa 1</h2>
+    <h2>Oceny uczniów - Klasa {{ groupId }}</h2>
 
     <div class="student-grades-table">
       <table class="subjects-table">
@@ -12,10 +12,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <td>Jan Kowalski</td>
-          <td><button class="addGrade" (click)="openModal()">2+</button></td>
-          <td>2.50</td>
+        <tr *ngFor="let student of students">
+          <td>{{ student.name }} {{ student.surname }}</td>
+          <td>
+            <button
+              *ngFor="let grade of student.grades"
+              class="addGrade"
+              (click)="openModal(grade, student.name + ' ' + student.surname)">
+              {{ grade.value }}
+            </button>
+          </td>
+          <td>{{ student.average | number:'1.2-2' }}</td>
         </tr>
         </tbody>
       </table>
@@ -32,7 +39,7 @@
     <input type="text" [value]="selectedGrade.student" disabled />
 
     <label>Ocena:</label>
-    <input type="text" [value]="selectedGrade.grade" disabled />
+    <input type="text" [value]="selectedGrade.value" disabled />
 
     <label>Typ oceny:</label>
     <input type="text" [value]="selectedGrade.type" disabled />

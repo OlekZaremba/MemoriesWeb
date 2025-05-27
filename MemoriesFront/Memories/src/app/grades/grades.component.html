@@ -4,7 +4,7 @@
       <div class="tile">
         <h2>Oceny</h2>
 
-        <!-- 🔒 Sekcja tylko dla nauczyciela -->
+        <!-- Nauczyciel -->
         <ng-container *ngIf="userRole === 'T'">
           <div class="teacher-control-buttons">
             <button (click)="goToAddGrade()">Dodaj ocenę</button>
@@ -32,8 +32,8 @@
           </p>
         </ng-container>
 
-        <!-- 👨‍🎓 Sekcja tylko dla ucznia -->
-        <div class="student-grades-table" *ngIf="userRole === 'S'">
+        <!-- Uczeń -->
+        <ng-container *ngIf="userRole === 'S'">
           <table class="subjects-table">
             <thead>
             <tr>
@@ -43,14 +43,23 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>Matematyka</td>
-              <td>3.00</td>
-              <td><button class="goToGrade" (click)="goToGradeView()">Przejdź</button></td>
+            <tr *ngFor="let subject of studentSubjects">
+              <td>{{ subject.className }}</td>
+              <td>{{ subject.average | number:'1.2-2' }}</td>
+              <td>
+                <button class="goToGrade" (click)="goToGradeView(subject.id)">Przejdź</button>
+              </td>
             </tr>
             </tbody>
           </table>
-        </div>
+        </ng-container>
+
+        <!-- Administrator -->
+        <ng-container *ngIf="userRole === 'A'">
+          <p style="font-size: 1.2rem; margin-top: 1rem;">
+            Widok administratora będzie dostępny wkrótce.
+          </p>
+        </ng-container>
 
       </div>
     </div>

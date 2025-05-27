@@ -36,16 +36,24 @@ import {SummaryComponent} from '../summary/summary.component';
 })
 export class HomepageComponent {
   activeView: string = 'glowna';
+  selectedGroupId: number | null = null;
 
   @ViewChild(LeftSidebarComponent, { static: true })
   leftSidebar!: LeftSidebarComponent;
 
   setActiveView(view: string) {
     console.log('Ustawiam widok na:', view, typeof view);
-    this.activeView = view;
+
+    if (view.startsWith('group-grades')) {
+      const [, groupId] = view.split(':');
+      this.activeView = 'group-grades';
+      this.selectedGroupId = Number(groupId);
+    } else {
+      this.activeView = view;
+    }
 
     if (this.leftSidebar) {
-      if (view === 'grade-view' || view == 'add-grade' || view == 'group-grades') {
+      if (view === 'grade-view' || view == 'add-grade' || view.startsWith('group-grades')) {
         this.leftSidebar.setActive('oceny');
       } else if (view === 'uzytkownicy' || view == 'group-users') {
         this.leftSidebar.setActive('uzytkownicy');
@@ -55,3 +63,4 @@ export class HomepageComponent {
     }
   }
 }
+

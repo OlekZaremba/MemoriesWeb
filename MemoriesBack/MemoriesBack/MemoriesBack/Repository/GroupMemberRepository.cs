@@ -42,7 +42,15 @@ namespace MemoriesBack.Repository
                 .Where(gm => gm.UserGroupId == userGroupId)
                 .ToListAsync();
         }
-
+        
+        public async Task<List<GroupMember>> GetByUserGroupIdWithUsersAsync(int groupId)
+        {
+            return await _context.GroupMembers
+                .Include(gm => gm.User)
+                .Where(gm => gm.UserGroupId == groupId)
+                .ToListAsync();
+        }
+        
         public async Task AddAsync(GroupMember gm)
         {
             await _context.GroupMembers.AddAsync(gm);

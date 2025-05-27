@@ -155,15 +155,41 @@ namespace MemoriesBack.Service
             return result;
         }
 
-        public async Task<List<StudentDTO>> GetStudentsForGroupAsync(int groupId)
+        public async Task<List<GroupStudentWithGradesDTO>> GetStudentsForGroupAsync(int groupId)
         {
-            var members = await _groupMemberRepository.GetByUserGroupIdAsync(groupId);
+            var members = await _groupMemberRepository.GetByUserGroupIdWithUsersAsync(groupId);
 
-            return members
-                .Select(m => m.User)
-                .Where(u => u.UserRole == User.Role.S)
-                .Select(u => new StudentDTO(u.Id, u.Name, u.Surname))
-                .ToList();
+            if (members == null || members.Count == 0)
+                return new List<GroupStudentWithGradesDTO>();
+
+            var result = new List<GroupStudentWithGradesDTO>();
+
+            foreach (var student in members.Select(m => m.User).Where(u => u.UserRole == User.Role.S))
+            {
+                var grades = await _gradeRepository.GetByStudentIdAsync(student.Id);
+
+                var gradeDtos = grades.Select(g => new GradeSimpleDTO(
+                    g.Id,
+                    g.GradeValue,
+                    g.Type ?? "",
+                    g.Description ?? "",
+                    g.IssueDate.ToString("yyyy-MM-dd")
+                )).ToList();
+
+                double average = gradeDtos.Any()
+                    ? Math.Round(gradeDtos.Average(g => g.Value), 2)
+                    : 0.0;
+
+                result.Add(new GroupStudentWithGradesDTO(
+                    student.Id,
+                    student.Name,
+                    student.Surname,
+                    gradeDtos,
+                    average
+                ));
+            }
+
+            return result;
         }
 
         public async Task<List<GradeSummaryDTO>> GetAllGradesForStudentAsync(int studentId)

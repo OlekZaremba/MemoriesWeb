@@ -1,7 +1,8 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 interface GroupDTO {
   id: number;
@@ -23,12 +24,11 @@ interface SubjectDTO {
 })
 export class GradesComponent implements OnInit {
   @Output() navigateTo = new EventEmitter<string>();
-
   userRole: string | null = null;
   teacherGroups: GroupDTO[] = [];
   studentSubjects: SubjectDTO[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
     this.userRole = sessionStorage.getItem('userRole');
@@ -66,18 +66,18 @@ export class GradesComponent implements OnInit {
 
   goToGradeView(subjectId?: number) {
     if (subjectId !== undefined) {
-      this.navigateTo.emit(`subject-grades/${subjectId}`);
+      this.router.navigate([`/subject-grades`, subjectId]);
     } else {
-      this.navigateTo.emit('grade-view');
+      this.router.navigate([`/grade-view`]);
     }
   }
 
   goToAddGrade() {
     this.loadTeacherGroups();
-    this.navigateTo.emit('add-grade');
+    this.router.navigate([`/add-grade`]);
   }
 
   goToGroupGrades(groupId: number) {
-    this.navigateTo.emit(`group-grades/${groupId}`);
+    this.navigateTo.emit(`group-grades:${groupId}`);
   }
 }
