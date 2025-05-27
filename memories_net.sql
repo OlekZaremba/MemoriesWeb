@@ -48,7 +48,7 @@ INSERT INTO `class` (`idclass`, `class_name`) VALUES
 
 CREATE TABLE `grades` (
   `idgrades` int(11) NOT NULL,
-  `grade` int(11) NOT NULL,
+  `grade` double NOT NULL,
   `description` varchar(255) DEFAULT NULL,
   `users_idstudent` int(11) NOT NULL,
   `users_idteacher` int(11) NOT NULL,
