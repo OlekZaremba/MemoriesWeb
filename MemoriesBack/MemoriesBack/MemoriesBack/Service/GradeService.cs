@@ -176,9 +176,11 @@ namespace MemoriesBack.Service
                     g.IssueDate.ToString("yyyy-MM-dd")
                 )).ToList();
 
-                double average = gradeDtos.Any()
-                    ? Math.Round(gradeDtos.Average(g => g.Value), 2)
-                    : 0.0;
+                double average = 0.0;
+                if (gradeDtos.Any())
+                {
+                    average = Math.Round(gradeDtos.Select(g => Convert.ToDouble(g.Value)).Average(), 2);
+                }
 
                 result.Add(new GroupStudentWithGradesDTO(
                     student.Id,
@@ -211,6 +213,5 @@ namespace MemoriesBack.Service
 
             return groups.Select(g => new TeacherGroupDTO(g.Id, g.GroupName)).ToList();
         }
-        
     }
 }

@@ -3,12 +3,12 @@
     public class GradeSummaryDTO
     {
         public int Id { get; set; }
-        public int Grade { get; set; }
+        public double Grade { get; set; }
         public string Type { get; set; }
         public string IssueDate { get; set; }
         public string ClassName { get; set; }
 
-        public GradeSummaryDTO(int id, int grade, string type, string issueDate, string className)
+        public GradeSummaryDTO(int id, double grade, string type, string issueDate, string className)
         {
             Id = id;
             Grade = grade;

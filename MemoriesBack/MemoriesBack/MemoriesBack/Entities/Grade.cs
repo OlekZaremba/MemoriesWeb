@@ -14,7 +14,7 @@ namespace MemoriesBack.Entities
 
         [Required]
         [Column("grade")]
-        public int GradeValue { get; set; }
+        public double GradeValue { get; set; }
 
         public string? Description { get; set; }
 

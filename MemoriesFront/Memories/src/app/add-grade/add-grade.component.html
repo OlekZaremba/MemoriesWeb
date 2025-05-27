@@ -28,8 +28,11 @@
     <h2>Nazwa twojego przedmiotu</h2>
 
     <label>Wybierz ucznia:</label>
-    <select [(ngModel)]="selectedStudent">
-      <option *ngFor="let student of students" [value]="student">{{ student }}</option>
+    <select [(ngModel)]="selectedStudentId">
+      <option *ngFor="let student of students" [value]="student.id">
+        {{ student.name }} {{ student.surname }}
+      </option>
+
     </select>
 
     <label>Wybierz ocenę:</label>
