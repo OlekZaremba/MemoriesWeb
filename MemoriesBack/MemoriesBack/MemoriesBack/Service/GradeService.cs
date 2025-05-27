@@ -64,7 +64,7 @@ namespace MemoriesBack.Service
                 ?? throw new ArgumentException("Brak członkostwa w grupie");
 
             var groupId = groupMember.UserGroupId;
-            var assignments = await _groupMemberClassRepository.GetByUserGroupIdAsync(groupId);
+            var assignments = await _groupMemberClassRepository.GetAllByGroupMemberIdAsync(groupMember.Id);
 
             var classList = assignments
                 .Select(gmc => gmc.SchoolClass)
@@ -93,8 +93,9 @@ namespace MemoriesBack.Service
                 .Select(g => new GradeSummaryDTO(
                     g.Id,
                     g.GradeValue,
-                    g.Type,
-                    g.IssueDate.ToString("yyyy-MM-dd")
+                    g.Type ?? "",
+                    g.IssueDate.ToString("yyyy-MM-dd"),
+                    g.SchoolClass?.ClassName ?? ""
                 ))
                 .ToList();
         }
@@ -107,12 +108,12 @@ namespace MemoriesBack.Service
             return new GradeDetailDTO(
                 g.Id,
                 g.GradeValue,
-                g.Type,
+                g.Type ?? "",
                 g.IssueDate.ToString("yyyy-MM-dd"),
-                g.Description,
+                g.Description ?? "",
                 $"{g.Student.Name} {g.Student.Surname}",
                 $"{g.Teacher.Name} {g.Teacher.Surname}",
-                g.SchoolClass.ClassName
+                g.SchoolClass?.ClassName ?? ""
             );
         }
 
@@ -123,9 +124,9 @@ namespace MemoriesBack.Service
             var dtos = grades.Select(g => new NewGradeDTO(
                 g.Id,
                 g.GradeValue,
-                g.Type,
+                g.Type ?? "",
                 g.IssueDate.ToString("yyyy-MM-dd"),
-                g.SchoolClass.ClassName
+                g.SchoolClass?.ClassName ?? ""
             )).ToList();
 
             foreach (var g in grades)
@@ -171,8 +172,9 @@ namespace MemoriesBack.Service
             return grades.Select(g => new GradeSummaryDTO(
                 g.Id,
                 g.GradeValue,
-                g.Type,
-                g.IssueDate.ToString("yyyy-MM-dd")
+                g.Type ?? "",
+                g.IssueDate.ToString("yyyy-MM-dd"),
+                g.SchoolClass?.ClassName ?? ""
             )).ToList();
         }
 
@@ -183,5 +185,6 @@ namespace MemoriesBack.Service
 
             return groups.Select(g => new TeacherGroupDTO(g.Id, g.GroupName)).ToList();
         }
+        
     }
 }

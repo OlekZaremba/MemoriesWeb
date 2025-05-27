@@ -40,6 +40,7 @@ namespace MemoriesBack.Repository
         public async Task<IEnumerable<Grade>> GetByStudentAndClassAsync(int studentId, int classId)
         {
             return await _context.Grades
+                .Include(g => g.SchoolClass)
                 .Where(g => g.StudentId == studentId && g.SchoolClassId == classId)
                 .OrderByDescending(g => g.Id)
                 .ToListAsync();
@@ -83,9 +84,11 @@ namespace MemoriesBack.Repository
         public async Task<IEnumerable<Grade>> GetByStudentIdAsync(int studentId)
         {
             return await _context.Grades
+                .Include(g => g.SchoolClass) 
                 .Where(g => g.StudentId == studentId)
                 .OrderByDescending(g => g.Id)
                 .ToListAsync();
         }
+
     }
 }

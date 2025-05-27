@@ -13,6 +13,7 @@ namespace MemoriesBack.Entities
         public int Id { get; set; }
 
         [Required]
+        [Column("grade")]
         public int GradeValue { get; set; }
 
         public string? Description { get; set; }
@@ -27,20 +28,20 @@ namespace MemoriesBack.Entities
         [Column("users_idstudent")]
         public int StudentId { get; set; }
 
-        public User Student { get; set; }
+        public virtual User Student { get; set; } = null!;
 
         [Required]
         [Column("users_idteacher")]
         public int TeacherId { get; set; }
 
-        public User Teacher { get; set; }
+        public virtual User Teacher { get; set; } = null!;
 
         [Required]
         [ForeignKey("SchoolClassId")]
         [Column("class_idclass")]
         public int SchoolClassId { get; set; }
 
-        public SchoolClass SchoolClass { get; set; }
+        public virtual SchoolClass SchoolClass { get; set; } = null!;
 
         [Required]
         public bool Notified { get; set; } = false;

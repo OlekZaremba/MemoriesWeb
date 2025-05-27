@@ -73,5 +73,13 @@ namespace MemoriesBack.Controller
             var students = await _gradeService.GetStudentsForGroupAsync(groupId);
             return Ok(students);
         }
+        
+        [HttpGet("student/{studentId}/subjects")]
+        public async Task<IActionResult> GetSubjectsForStudent(int studentId)
+        {
+            var subjects = await _gradeService.GetSubjectsForStudentAsync(studentId);
+            return Ok(subjects);
+        }
+
     }
 }

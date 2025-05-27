@@ -8,6 +8,12 @@ interface GroupDTO {
   groupName: string;
 }
 
+interface SubjectDTO {
+  id: number;
+  className: string; // ✅ Zmieniono z "name" na "className"
+  average: number;
+}
+
 @Component({
   selector: 'app-grades',
   standalone: true,
@@ -17,8 +23,10 @@ interface GroupDTO {
 })
 export class GradesComponent implements OnInit {
   @Output() navigateTo = new EventEmitter<string>();
+
   userRole: string | null = null;
   teacherGroups: GroupDTO[] = [];
+  studentSubjects: SubjectDTO[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -28,6 +36,10 @@ export class GradesComponent implements OnInit {
     if (this.userRole === 'T') {
       this.loadTeacherGroups();
     }
+
+    if (this.userRole === 'S') {
+      this.loadStudentSubjects();
+    }
   }
 
   loadTeacherGroups(): void {
@@ -35,18 +47,29 @@ export class GradesComponent implements OnInit {
     if (teacherId) {
       this.http.get<GroupDTO[]>(`${environment.apiUrl}/groups/teacher/${teacherId}`)
         .subscribe({
-          next: (groups) => {
-            this.teacherGroups = groups;
-          },
-          error: (err) => {
-            console.error('Błąd przy pobieraniu grup nauczyciela:', err);
-          }
+          next: (groups) => this.teacherGroups = groups,
+          error: (err) => console.error('Błąd przy pobieraniu grup nauczyciela:', err)
         });
     }
   }
 
-  goToGradeView() {
-    this.navigateTo.emit('grade-view');
+  loadStudentSubjects(): void {
+    const studentId = sessionStorage.getItem('userId');
+    if (studentId) {
+      this.http.get<SubjectDTO[]>(`${environment.apiUrl}/grades/student/${studentId}/subjects`)
+        .subscribe({
+          next: (subjects) => this.studentSubjects = subjects,
+          error: (err) => console.error('Błąd przy pobieraniu przedmiotów ucznia:', err)
+        });
+    }
+  }
+
+  goToGradeView(subjectId?: number) {
+    if (subjectId !== undefined) {
+      this.navigateTo.emit(`subject-grades/${subjectId}`);
+    } else {
+      this.navigateTo.emit('grade-view');
+    }
   }
 
   goToAddGrade() {
