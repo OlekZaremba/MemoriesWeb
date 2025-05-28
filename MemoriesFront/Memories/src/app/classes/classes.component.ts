@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 interface SubjectDTO {
   id: number;
   className: string;
+  teachers?: ClassTeacherDTO[];
 }
 
 interface GroupDTO {
@@ -19,6 +20,14 @@ interface TeacherDTO {
   name: string;
   surname: string;
 }
+
+interface ClassTeacherDTO {
+  teacherId: number;
+  teacherName: string;
+  groupId: number;
+  groupName: string;
+}
+
 
 @Component({
   selector: 'app-classes',
@@ -50,7 +59,16 @@ export class ClassesComponent implements OnInit {
 
   loadSubjects() {
     this.http.get<SubjectDTO[]>(`${environment.apiUrl}/classes`).subscribe({
-      next: res => this.subjects = res,
+      next: res => {
+        this.subjects = res;
+        this.subjects.forEach(subject => {
+          this.http.get<ClassTeacherDTO[]>(`${environment.apiUrl}/class/${subject.id}/teachers`)
+            .subscribe({
+              next: teachers => subject.teachers = teachers,
+              error: err => console.error(`Błąd ładowania nauczycieli dla przedmiotu ${subject.className}:`, err)
+            });
+        });
+      },
       error: err => console.error('Błąd ładowania przedmiotów:', err)
     });
   }
@@ -104,11 +122,9 @@ export class ClassesComponent implements OnInit {
   assignTeacherToGroupAndSubject() {
     if (!this.selectedTeacherId || !this.selectedGroupId || !this.selectedSubjectId) return;
 
-    // Krok 1: przypisz nauczyciela do grupy
     this.http.post(`${environment.apiUrl}/assignments/teacher/${this.selectedTeacherId}/group/${this.selectedGroupId}`, {})
       .subscribe({
         next: () => {
-          // Krok 2: przypisz przedmiot do nauczyciela w tej grupie
           this.http.post(`${environment.apiUrl}/assignments/teacher/${this.selectedTeacherId}/group/${this.selectedGroupId}/class/${this.selectedSubjectId}`, {})
             .subscribe({
               next: () => {

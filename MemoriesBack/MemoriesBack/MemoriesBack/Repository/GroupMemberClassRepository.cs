@@ -79,5 +79,16 @@ namespace MemoriesBack.Repository
             await _context.GroupMemberClasses.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
+        
+        public async Task<List<GroupMemberClass>> GetFullInfoByClassIdAsync(int classId)
+        {
+            return await _context.GroupMemberClasses
+                .Where(gmc => gmc.SchoolClassId == classId)
+                .Include(gmc => gmc.GroupMember)
+                .ThenInclude(gm => gm.User)
+                .Include(gmc => gmc.GroupMember)
+                .ThenInclude(gm => gm.UserGroup)
+                .ToListAsync();
+        }
     }
 }
