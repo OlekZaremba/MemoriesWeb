@@ -152,5 +152,6 @@ button:hover {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.25rem;
+  min-height: 2rem;
 }
 
