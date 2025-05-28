@@ -38,17 +38,21 @@ namespace MemoriesBack.Controller
         [HttpGet("{groupId}/students")]
         public async Task<ActionResult<List<UserDTO>>> GetStudentsInGroup(int groupId)
         {
-            var members = await _groupMemberRepository.GetByUserGroupIdAsync(groupId);
-            var userIds = members.Select(m => m.UserId).ToList();
-            var users = await _userRepository.GetAllAsync();
+            var members = await _groupMemberRepository.GetByUserGroupIdWithUsersAsync(groupId);
 
-            var students = users
-                .Where(u => userIds.Contains(u.Id) && u.UserRole == EntityUser.Role.S)
-                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole.ToString()))
+            var students = members
+                .Where(m => m.User != null && m.User.UserRole == EntityUser.Role.S)
+                .Select(m => new UserDTO(
+                    m.User.Id,
+                    m.User.Name,
+                    m.User.Surname,
+                    m.User.UserRole.ToString()
+                ))
                 .ToList();
 
             return Ok(students);
         }
+
 
         [HttpPost]
         public async Task<ActionResult<GroupDTO>> CreateGroup([FromBody] CreateGroupRequest request)

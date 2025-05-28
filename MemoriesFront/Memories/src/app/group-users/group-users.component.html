@@ -1,8 +1,9 @@
 <div class="main">
   <div class="content">
     <div class="grades">
-      <div class="tile ">
-        <h2>Użytkownicy - Klasa 1</h2>
+      <div class="tile">
+        <h2>Użytkownicy - Klasa {{ groupId }}</h2>
+
         <div class="student-grades-table">
           <table class="subjects-table">
             <thead>
@@ -11,13 +12,16 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>Michał Uczniowski</td>
+            <tr *ngFor="let student of students">
+              <td>{{ student.name }} {{ student.surname }}</td>
+            </tr>
+            <tr *ngIf="students.length === 0">
+              <td>Brak uczniów w tej klasie.</td>
             </tr>
             </tbody>
           </table>
         </div>
+      </div>
     </div>
   </div>
-</div>
 </div>

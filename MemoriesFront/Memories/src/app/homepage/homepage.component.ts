@@ -41,24 +41,31 @@ export class HomepageComponent {
   @ViewChild(LeftSidebarComponent, { static: true })
   leftSidebar!: LeftSidebarComponent;
 
-  setActiveView(view: string) {
-    console.log('Ustawiam widok na:', view, typeof view);
-
-    if (view.startsWith('group-grades')) {
-      const [, groupId] = view.split(':');
-      this.activeView = 'group-grades';
-      this.selectedGroupId = Number(groupId);
-    } else {
+  setActiveView(view: string | { view: string, groupId?: number }) {
+    if (typeof view === 'string') {
       this.activeView = view;
+      this.selectedGroupId = null;
+    } else {
+      this.activeView = view.view;
+
+      if (view.view === 'group-users') {
+        this.selectedGroupId = view.groupId ?? null;
+      } else {
+        this.selectedGroupId = null;
+      }
     }
 
     if (this.leftSidebar) {
-      if (view === 'grade-view' || view == 'add-grade' || view.startsWith('group-grades')) {
+      if (
+        this.activeView === 'grade-view' ||
+        this.activeView === 'add-grade' ||
+        this.activeView.startsWith('group-grades')
+      ) {
         this.leftSidebar.setActive('oceny');
-      } else if (view === 'uzytkownicy' || view == 'group-users') {
+      } else if (this.activeView === 'uzytkownicy' || this.activeView === 'group-users') {
         this.leftSidebar.setActive('uzytkownicy');
       } else {
-        this.leftSidebar.setActive(view);
+        this.leftSidebar.setActive(this.activeView);
       }
     }
   }
