@@ -28,7 +28,6 @@ interface ClassTeacherDTO {
   groupName: string;
 }
 
-
 @Component({
   selector: 'app-classes',
   standalone: true,
@@ -125,16 +124,63 @@ export class ClassesComponent implements OnInit {
     this.http.post(`${environment.apiUrl}/assignments/teacher/${this.selectedTeacherId}/group/${this.selectedGroupId}`, {})
       .subscribe({
         next: () => {
-          this.http.post(`${environment.apiUrl}/assignments/teacher/${this.selectedTeacherId}/group/${this.selectedGroupId}/class/${this.selectedSubjectId}`, {})
-            .subscribe({
-              next: () => {
-                console.log('Przypisano nauczyciela do przedmiotu i grupy.');
-                this.closeAssignTeacherModal();
-              },
-              error: err => console.error('Błąd przypisania przedmiotu:', err)
-            });
+          this.getGroupMemberId(this.selectedTeacherId!, this.selectedGroupId!).then(groupMemberId => {
+            console.log('Resolved groupMemberId:', groupMemberId);
+            if (!groupMemberId) {
+              console.error('Nie znaleziono przypisanego nauczyciela do klasy.');
+              return;
+            }
+
+            this.http.post(`${environment.apiUrl}/group-members/${groupMemberId}/class/${this.selectedSubjectId}`, {})
+              .subscribe({
+                next: () => {
+                  console.log('Pełna relacja nauczyciel-klasa-przedmiot zapisana.');
+                  this.closeAssignTeacherModal();
+                  this.loadSubjects();
+                },
+                error: err => {
+                  console.error('Błąd przypisania przedmiotu:', err);
+                }
+              });
+          });
         },
-        error: err => console.error('Błąd przypisania nauczyciela do grupy:', err)
+        error: err => {
+          if (err.status === 400) {
+            console.warn('Nauczyciel już przypisany do klasy – kontynuuję...');
+            this.getGroupMemberId(this.selectedTeacherId!, this.selectedGroupId!).then(groupMemberId => {
+              console.log('Resolved groupMemberId (fallback):', groupMemberId);
+              if (!groupMemberId) return;
+
+              this.http.post(`${environment.apiUrl}/group-members/${groupMemberId}/class/${this.selectedSubjectId}`, {})
+                .subscribe({
+                  next: () => {
+                    console.log('Przypisano przedmiot mimo wcześniejszej relacji.');
+                    this.closeAssignTeacherModal();
+                    this.loadSubjects();
+                  },
+                  error: err => {
+                    console.error('Błąd przypisania przedmiotu:', err);
+                  }
+                });
+            });
+          } else {
+            console.error('Błąd przypisywania nauczyciela do klasy:', err);
+          }
+        }
       });
+  }
+
+  private getGroupMemberId(teacherId: number, groupId: number): Promise<number | null> {
+    return new Promise((resolve) => {
+      this.http.get<{ id: number } | null>(
+        `${environment.apiUrl}/group-members/teacher/${teacherId}/group/${groupId}`
+      ).subscribe({
+        next: res => resolve(res?.id ?? null),
+        error: err => {
+          console.error('Błąd pobierania groupMemberId:', err);
+          resolve(null);
+        }
+      });
+    });
   }
 }

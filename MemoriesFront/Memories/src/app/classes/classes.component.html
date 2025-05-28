@@ -23,14 +23,12 @@
             <tr *ngFor="let subject of subjects">
               <td>{{ subject.className }}</td>
               <td>
-                <div *ngIf="subject.teachers?.length; else noTeachers">
-                  <div *ngFor="let teacher of subject.teachers">
-                    {{ teacher.teacherName }} ({{ teacher.groupName }})
+                <div *ngIf="subject.teachers?.length; else brak">
+                  <div *ngFor="let t of subject.teachers">
+                    {{ t.teacherName }} ({{ t.groupName }})
                   </div>
                 </div>
-                <ng-template #noTeachers>
-                  Brak przypisań
-                </ng-template>
+                <ng-template #brak>Brak przypisań</ng-template>
               </td>
               <td>
                 <button class="goToGrade" (click)="openAssignTeacherModal(subject.id)">Przypisz</button>
@@ -49,9 +47,8 @@
   <div class="modal">
     <h2>Dodaj przedmiot</h2>
 
-    <label for="subjectName">Nazwa przedmiotu:</label>
+    <label>Nazwa przedmiotu:</label>
     <input
-      id="subjectName"
       type="text"
       [(ngModel)]="newSubjectName"
       placeholder="Wpisz nazwę przedmiotu"
@@ -64,23 +61,23 @@
   </div>
 </div>
 
-<!-- Modal: Przypisz nauczyciela -->
+<!-- Modal: Przypisz przedmiot do nauczyciela w klasie -->
 <div class="modal-backdrop" *ngIf="showAssignTeacherModal">
   <div class="modal">
-    <h2>Przypisz nauczyciela do grupy i przedmiotu</h2>
+    <h2>Przypisz przedmiot nauczycielowi w klasie</h2>
 
-    <label for="teacherSelect">Wybierz nauczyciela:</label>
-    <select id="teacherSelect" [(ngModel)]="selectedTeacherId">
-      <option [value]="null" disabled selected>-- Wybierz nauczyciela --</option>
-      <option *ngFor="let teacher of teachers" [value]="teacher.id">
+    <label>Nauczyciel:</label>
+    <select [(ngModel)]="selectedTeacherId">
+      <option [ngValue]="null" disabled>-- Wybierz nauczyciela --</option>
+      <option *ngFor="let teacher of teachers" [ngValue]="teacher.id">
         {{ teacher.name }} {{ teacher.surname }}
       </option>
     </select>
 
-    <label for="groupSelect">Wybierz klasę:</label>
-    <select id="groupSelect" [(ngModel)]="selectedGroupId">
-      <option [value]="null" disabled selected>-- Wybierz klasę --</option>
-      <option *ngFor="let group of groups" [value]="group.id">
+    <label>Klasa:</label>
+    <select [(ngModel)]="selectedGroupId">
+      <option [ngValue]="null" disabled>-- Wybierz klasę --</option>
+      <option *ngFor="let group of groups" [ngValue]="group.id">
         {{ group.groupName }}
       </option>
     </select>

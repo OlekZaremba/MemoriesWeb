@@ -32,11 +32,24 @@ namespace MemoriesBack.Service
         public async Task AssignTeacherToGroupAsync(int teacherId, int groupId)
         {
             var teacher = await _userRepo.GetByIdAsync(teacherId)
-                ?? throw new ArgumentException("Nie znaleziono nauczyciela");
+                          ?? throw new ArgumentException("Nie znaleziono nauczyciela");
             var group = await _groupRepo.GetByIdAsync(groupId)
-                ?? throw new ArgumentException("Nie znaleziono grupy");
+                        ?? throw new ArgumentException("Nie znaleziono grupy");
+            
+            var existing = await _groupMemberRepo.GetByUserIdAndGroupIdAsync(teacherId, groupId);
+            if (existing != null)
+            {
+                throw new InvalidOperationException("Nauczyciel już przypisany do tej klasy.");
+            }
 
-            var member = new GroupMember { User = teacher, UserId = teacherId, UserGroup = group, UserGroupId = groupId };
+            var member = new GroupMember
+            {
+                User = teacher,
+                UserId = teacherId,
+                UserGroup = group,
+                UserGroupId = groupId
+            };
+
             await _groupMemberRepo.AddAsync(member);
         }
 
