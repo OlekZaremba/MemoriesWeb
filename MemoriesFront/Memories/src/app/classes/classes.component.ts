@@ -9,6 +9,17 @@ interface SubjectDTO {
   className: string;
 }
 
+interface GroupDTO {
+  id: number;
+  groupName: string;
+}
+
+interface TeacherDTO {
+  id: number;
+  name: string;
+  surname: string;
+}
+
 @Component({
   selector: 'app-classes',
   standalone: true,
@@ -20,21 +31,41 @@ export class ClassesComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   showAddSubjectModal = false;
-  newSubjectName: string = '';
   showAssignTeacherModal = false;
-  availableTeachers = ['Jan Kowalski', 'Anna Nowak', 'Tomasz Zięba'];
-  selectedTeachers: string[] = [];
+  newSubjectName: string = '';
 
   subjects: SubjectDTO[] = [];
+  groups: GroupDTO[] = [];
+  teachers: TeacherDTO[] = [];
+
+  selectedGroupId: number | null = null;
+  selectedSubjectId: number | null = null;
+  selectedTeacherId: number | null = null;
 
   ngOnInit(): void {
     this.loadSubjects();
+    this.loadGroups();
+    this.loadTeachers();
   }
 
-  loadSubjects(): void {
+  loadSubjects() {
     this.http.get<SubjectDTO[]>(`${environment.apiUrl}/classes`).subscribe({
-      next: (res) => this.subjects = res,
-      error: (err) => console.error('Błąd przy pobieraniu przedmiotów:', err)
+      next: res => this.subjects = res,
+      error: err => console.error('Błąd ładowania przedmiotów:', err)
+    });
+  }
+
+  loadGroups() {
+    this.http.get<GroupDTO[]>(`${environment.apiUrl}/groups`).subscribe({
+      next: res => this.groups = res,
+      error: err => console.error('Błąd ładowania grup:', err)
+    });
+  }
+
+  loadTeachers() {
+    this.http.get<TeacherDTO[]>(`${environment.apiUrl}/users/teachers`).subscribe({
+      next: res => this.teachers = res,
+      error: err => console.error('Błąd ładowania nauczycieli:', err)
     });
   }
 
@@ -48,27 +79,21 @@ export class ClassesComponent implements OnInit {
   }
 
   addSubject() {
-    const trimmedName = this.newSubjectName.trim();
-    if (!trimmedName) return;
-
-    const body = {
-      className: trimmedName
-    };
-
-    this.http.post(`${environment.apiUrl}/classes`, body).subscribe({
+    const name = this.newSubjectName.trim();
+    if (!name) return;
+    this.http.post(`${environment.apiUrl}/classes`, { className: name }).subscribe({
       next: () => {
-        console.log('Przedmiot dodany:', trimmedName);
         this.loadSubjects();
         this.closeAddSubjectModal();
       },
-      error: (err) => {
-        console.error('Błąd przy dodawaniu przedmiotu:', err);
-      }
+      error: err => console.error('Błąd dodawania przedmiotu:', err)
     });
   }
 
-  openAssignTeacherModal() {
-    this.selectedTeachers = [];
+  openAssignTeacherModal(subjectId: number) {
+    this.selectedSubjectId = subjectId;
+    this.selectedTeacherId = null;
+    this.selectedGroupId = null;
     this.showAssignTeacherModal = true;
   }
 
@@ -76,16 +101,24 @@ export class ClassesComponent implements OnInit {
     this.showAssignTeacherModal = false;
   }
 
-  toggleTeacher(teacher: string, checked: boolean) {
-    if (checked) {
-      this.selectedTeachers.push(teacher);
-    } else {
-      this.selectedTeachers = this.selectedTeachers.filter(t => t !== teacher);
-    }
-  }
+  assignTeacherToGroupAndSubject() {
+    if (!this.selectedTeacherId || !this.selectedGroupId || !this.selectedSubjectId) return;
 
-  assignTeachers() {
-    console.log('Przypisano nauczycieli:', this.selectedTeachers);
-    this.closeAssignTeacherModal();
+    // Krok 1: przypisz nauczyciela do grupy
+    this.http.post(`${environment.apiUrl}/assignments/teacher/${this.selectedTeacherId}/group/${this.selectedGroupId}`, {})
+      .subscribe({
+        next: () => {
+          // Krok 2: przypisz przedmiot do nauczyciela w tej grupie
+          this.http.post(`${environment.apiUrl}/assignments/teacher/${this.selectedTeacherId}/group/${this.selectedGroupId}/class/${this.selectedSubjectId}`, {})
+            .subscribe({
+              next: () => {
+                console.log('Przypisano nauczyciela do przedmiotu i grupy.');
+                this.closeAssignTeacherModal();
+              },
+              error: err => console.error('Błąd przypisania przedmiotu:', err)
+            });
+        },
+        error: err => console.error('Błąd przypisania nauczyciela do grupy:', err)
+      });
   }
 }
