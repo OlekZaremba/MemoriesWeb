@@ -4,7 +4,9 @@
     <button [class.active]="activeButton === 'oceny'" (click)="setActive('oceny')"><img src="/exam.png">Oceny</button>
     <button [class.active]="activeButton === 'uzytkownicy'" (click)="setActive('uzytkownicy')"><img src="/group.png">Użytkownicy</button>
 <!--    tu adi jakis NgIf musi byc na role uzytkownika bo nie chcemy wyswietlac przedmiotow jesli ktos nie jest adminem-->
-    <button [class.active]="activeButton === 'przedmioty'" (click)="setActive('przedmioty')"><img src="/book.png">Przedmioty</button>
+    <!-- Przedmioty (widoczne tylko dla admina) -->
+    <button *ngIf="userRole === 'A'" [class.active]="activeButton === 'przedmioty'" (click)="setActive('przedmioty')">
+      <img src="/book.png">Przedmioty</button>
     <button [class.active]="activeButton === 'plan'" (click)="setActive('plan')"><img src="/event.png">Plan zajęć</button>
     <button [class.active]="activeButton === 'wykresy'" (click)="setActive('wykresy')"><img src="/trend.png">Podsumowanie</button>
     <button routerLink="/"><img src="/logout.png">Wyloguj</button>
