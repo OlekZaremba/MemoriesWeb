@@ -44,7 +44,7 @@ namespace MemoriesBack.Controller
 
             var students = users
                 .Where(u => userIds.Contains(u.Id) && u.UserRole == EntityUser.Role.S)
-                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole))
+                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole.ToString()))
                 .ToList();
 
             return Ok(students);
@@ -75,7 +75,7 @@ namespace MemoriesBack.Controller
 
             var teachers = users
                 .Where(u => userIds.Contains(u.Id) && u.UserRole == EntityUser.Role.T)
-                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole))
+                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole.ToString()))
                 .ToList();
 
             return Ok(teachers);
