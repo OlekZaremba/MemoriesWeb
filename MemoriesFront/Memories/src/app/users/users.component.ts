@@ -32,13 +32,18 @@ export class UsersComponent implements OnInit {
     firstName: '',
     lastName: '',
     email: '',
-    role: ''
+    role: '',
+    groupId: null as number | null,
+    login: ''
   };
+
 
   showAssignModal = false;
   selectedUserName = '';
   availableClasses = ['Klasa 1', 'Klasa 2', 'Klasa 3'];
   selectedClasses: string[] = [];
+
+  availableGroups: { id: number, groupName: string }[] = [];
 
   userRole: string | null = null;
   userId: number = 0;
@@ -61,6 +66,7 @@ export class UsersComponent implements OnInit {
       this.loadGroupsForTeacher();
     } else if (this.userRole === 'A') {
       this.loadAllUsers();
+      this.loadAvailableGroups();
     }
   }
 
@@ -82,6 +88,13 @@ export class UsersComponent implements OnInit {
     this.http.get<any[]>(`${BASE_URL}/api/users`)
       .subscribe(data => {
         this.allUsers = data;
+      });
+  }
+
+  loadAvailableGroups() {
+    this.http.get<{ id: number, groupName: string }[]>(`${BASE_URL}/api/groups`)
+      .subscribe(data => {
+        this.availableGroups = data;
       });
   }
 
@@ -156,18 +169,49 @@ export class UsersComponent implements OnInit {
       firstName: '',
       lastName: '',
       email: '',
-      role: 'Uczeń'
+      role: 'Uczeń',
+      groupId: null,
+      login: ''
     };
     this.showCreateModal = true;
   }
+
 
   closeCreateModal() {
     this.showCreateModal = false;
   }
 
   createUser() {
-    console.log('👤 Tworzenie użytkownika:', this.newUser);
-    this.closeCreateModal();
+    const roleMap: Record<string, string> = {
+      "Uczeń": "S",
+      "Nauczyciel": "T",
+      "Admin": "A"
+    };
+
+    this.newUser.login = this.newUser.email;
+
+    const payload = {
+      name: this.newUser.firstName,
+      surname: this.newUser.lastName,
+      login: this.newUser.login,
+      email: this.newUser.email,
+      password: "test123",
+      role: roleMap[this.newUser.role],
+      groupId: this.newUser.groupId
+    };
+
+
+    this.http.post(`${BASE_URL}/api/auth/register`, payload).subscribe({
+      next: () => {
+        alert('Użytkownik został utworzony');
+        this.closeCreateModal();
+        this.loadAllUsers();
+      },
+      error: (err) => {
+        console.error('❌ Błąd przy tworzeniu użytkownika:', err);
+        alert('Nie udało się utworzyć użytkownika.');
+      }
+    });
   }
 
   filteredUsers() {

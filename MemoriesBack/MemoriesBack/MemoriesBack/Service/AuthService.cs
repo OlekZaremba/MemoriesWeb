@@ -78,9 +78,11 @@ namespace MemoriesBack.Service
             var sensitive = new SensitiveData
             {
                 Login = request.Login,
+                Email = request.Email, // ← DODAJ TO
                 Password = _passwordHasher.HashPassword(user, request.Password),
                 User = user
             };
+
 
             await _sensitiveDataRepository.AddAsync(sensitive);
 

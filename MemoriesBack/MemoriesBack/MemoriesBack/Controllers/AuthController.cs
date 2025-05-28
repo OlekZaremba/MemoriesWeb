@@ -32,7 +32,7 @@ namespace MemoriesBack.Controllers
             {
                 await _authService.RegisterUser(request);
                 _logger.LogDebug("<<< POST /api/auth/register OK");
-                return Ok("Użytkownik został utworzony");
+                return Ok(new { message = "Użytkownik został utworzony" });
             }
             catch (Exception ex)
             {
