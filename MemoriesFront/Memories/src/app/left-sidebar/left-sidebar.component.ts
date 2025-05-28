@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import {NgIf} from '@angular/common';
+import { NgIf } from '@angular/common';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-left-sidebar',
@@ -18,9 +20,12 @@ export class LeftSidebarComponent implements OnInit {
   @Output() viewChange = new EventEmitter<string>();
   activeButton: string = 'glowna';
   userRole: string | null = null;
+  private router = inject(Router);
 
   ngOnInit(): void {
-    this.userRole = sessionStorage.getItem('userRole');
+    if (typeof window !== 'undefined') {
+      this.userRole = sessionStorage.getItem('userRole');
+    }
   }
 
   setActive(view: string) {
@@ -30,5 +35,10 @@ export class LeftSidebarComponent implements OnInit {
     } else {
       this.activeButton = view;
     }
+  }
+
+  logout(): void {
+    sessionStorage.clear();
+    this.router.navigateByUrl('/', { replaceUrl: true });
   }
 }

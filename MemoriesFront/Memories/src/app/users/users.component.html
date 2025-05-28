@@ -1,36 +1,29 @@
 <div class="main">
   <div class="content">
     <div class="grades">
-      <div class="tile ">
+      <div class="tile">
         <h2>Użytkownicy</h2>
-        <!--    KOM DLA ADIEGO: CAŁY TEN DIV ZOSTAJE, JEŻELI ROLA == UCZEŃ A RESZTA SIĘ CHOWA-->
-        <!--        TABELA UŻYTKOWNIKÓW DLA UCZNIÓW!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
-        <div class="student-grades-table">
-          <!--    KOM DLA ADIEGO: TU MAJĄ SIĘ POJAWIAĆ WSZYSCY NAUCZYCIELE KTÓRZY UCZĄ KLASY W KTÓREJ ZNAJDUJE SIĘ DANY UCZEŃ-->
+
+        <!-- Widok STUDENTA -->
+        <div class="student-grades-table" *ngIf="userRole === 'S'">
           <table class="subjects-table">
             <thead>
             <tr>
               <th>Imię i nazwisko nauczyciela</th>
-              <th>Przemiot wiodący</th>
+              <th>Przedmiot wiodący</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>Jan Nauczycielski</td>
-              <td>język polski</td>
+            <tr *ngFor="let teacher of teachersForStudent">
+              <td>{{ teacher.name }} {{ teacher.surname }}</td>
+              <td>{{ teacher.subject }}</td>
             </tr>
             </tbody>
           </table>
         </div>
 
-
-        <!--    KOM DLA ADIEGO: CAŁY TEN DIV ZOSTAJE, JEŻELI ROLA == NAUCZYCIEL A RESZTA SIĘ CHOWA-->
-        <!--        TABELA UŻYTKOWNIKÓW DLA NAUCZYCIELI!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
-        <!--    KOM DLA ADIEGO: TU MAJĄ SIĘ POJAWIAĆ WSZYSCY NAUCZYCIELE KTÓRZY UCZĄ KLASY W KTÓREJ ZNAJDUJE SIĘ DANY UCZEŃ-->
-        <br>
-
-        <div class="student-grades-table">
-          <!--    KOM DLA ADIEGO: TU MAJĄ DODAWAĆ SIĘ KLASY DYNAMICZNIE Z BAZY DANYCH ŻEBY MÓC PODEJRZEĆ UCZNIÓW (UŻYTKOWNIKÓW)-->
+        <!-- Widok NAUCZYCIELA -->
+        <div class="student-grades-table" *ngIf="userRole === 'T'">
           <table class="subjects-table">
             <thead>
             <tr>
@@ -39,170 +32,62 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>Klasa 1</td>
-              <td><button class="goToGrade" (click)="goToGroupUsersView()">Przeglądaj</button></td>
-            </tr>
-            <tr>
-              <td>Klasa 2</td>
-              <td><button class="goToGrade" (click)="goToGroupUsersView()">Przeglądaj</button></td>
+            <tr *ngFor="let group of teacherGroups">
+              <td>{{ group.groupName }}</td>
+              <td><button class="goToGrade" (click)="goToGroupUsersView(group.id)">Przeglądaj</button></td>
             </tr>
             </tbody>
           </table>
         </div>
 
-        <!--    KOM DLA ADIEGO: CAŁY TEN DIV ZOSTAJE, JEŻELI ROLA == ADMIN A RESZTA SIĘ CHOWA-->
-        <!--        TABELA UŻYTKOWNIKÓW DLA ADMINÓW!!!!!!!! - TABELE MAJĄ SIĘ CHOWAĆ LUB POJAWIAĆ W ZALEŻNOŚCI OD ROLI-->
-        <!--    KOM DLA ADIEGO: TU MAJĄ SIĘ POJAWIAĆ WSZYSCY UŻYTKOWNICY-->
+        <!-- Widok ADMINISTRATORA -->
+        <div *ngIf="userRole === 'A'">
+          <div class="teacher-control-buttons">
+            <button (click)="openCreateModal()">Dodaj użytkownika</button>
+            <input
+              type="text"
+              placeholder="Wpisz nazwę użytkownika"
+              class="user-search-input"
+              [(ngModel)]="searchTerm"
+            />
+          </div>
 
-        <div class="teacher-control-buttons">
-          <button (click)="openCreateModal()">Dodaj użytkownika</button>
-          <input
-            type="text"
-            placeholder="Wpisz nazwę użytkownika"
-            class="user-search-input"
-          />
-        </div>
-
-        <div class="student-grades-table">
-          <table class="subjects-table">
-            <thead>
-            <tr>
-              <th>Imię</th>
-              <th>Nazwisko</th>
-              <th>Grupy</th>
-              <th>E-mail</th>
-              <th>Rola</th>
-              <th>Resetuj hasło</th>
-              <th>Przypisz do grupy</th>
-              <th>Edycja użytkownika</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-              <td>Uczeń</td>
-              <td>Uczniowski</td>
-              <td>Klasa 1</td>
-              <td>testowymail.com</td>
-              <td>Uczeń</td>
-              <td><button class="goToGrade" (click)="openResetModal('testowymail.com')">Resetuj</button></td>
-              <td><button class="goToGrade" (click)="openAssignModal('Uczeń Uczniowski')">Przypisz</button></td>
-              <td>
-                <button class="goToGrade" (click)="openEditModal({
-                  firstName: 'Uczeń',
-                  lastName: 'Uczniowski',
-                  email: 'testowymail.com',
-                  role: 'Uczeń',
-                  groups: 'Klasa 1'
-                })">Edytuj</button>
-              </td>
-
-            </tr>
-            </tbody>
-          </table>
+          <div class="student-grades-table">
+            <table class="subjects-table">
+              <thead>
+              <tr>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Grupy</th>
+                <th>E-mail</th>
+                <th>Rola</th>
+                <th>Resetuj hasło</th>
+                <th>Przypisz do grupy</th>
+                <th>Edycja użytkownika</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let user of filteredUsers()">
+                <td>{{ user.name }}</td>
+                <td>{{ user.surname }}</td>
+                <td>–</td> <!-- Można uzupełnić później -->
+                <td>–</td> <!-- Można uzupełnić później -->
+                <td>{{ mapRole(user.role) }}</td>
+                <td>
+                  <button class="goToGrade" (click)="openResetModal(user.email)">Resetuj</button>
+                </td>
+                <td>
+                  <button class="goToGrade" (click)="openAssignModal(user.name + ' ' + user.surname)">Przypisz</button>
+                </td>
+                <td>
+                  <button class="goToGrade" (click)="prepareUserForEdit(user)">Edytuj</button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Reset password modal -->
-<div class="modal-backdrop" *ngIf="showResetModal">
-  <div class="modal">
-    <h2>Resetowanie hasła</h2>
-
-    <label>E-mail użytkownika:</label>
-    <input type="text" [value]="selectedEmail" disabled />
-
-    <div class="modal-buttons">
-      <button (click)="resetPassword()">Zresetuj hasło</button>
-      <button (click)="closeResetModal()">Anuluj</button>
-    </div>
-  </div>
-</div>
-
-<!-- Assign to group modal -->
-<div class="modal-backdrop" *ngIf="showAssignModal">
-  <div class="modal">
-    <h2>Przypisz do grup</h2>
-
-    <label>Użytkownik:</label>
-    <input type="text" [value]="selectedUserName" disabled />
-
-    <label>Wybierz grupy:</label>
-    <label *ngFor="let cls of availableClasses" class="checkbox-row">
-      <input
-        type="checkbox"
-        [checked]="selectedClasses.includes(cls)"
-        #cb
-        (change)="toggleGroup(cls, cb.checked)"
-      />
-      {{ cls }}
-    </label>
-    <div class="modal-buttons">
-      <button (click)="assignToGroups()">Zapisz</button>
-      <button (click)="closeAssignModal()">Anuluj</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- Edit user modal -->
-<div class="modal-backdrop" *ngIf="showEditModal">
-  <div class="modal">
-    <h2>Edytuj użytkownika</h2>
-
-    <label>Imię:</label>
-    <input type="text" [(ngModel)]="editUser.firstName" />
-
-    <label>Nazwisko:</label>
-    <input type="text" [(ngModel)]="editUser.lastName" />
-
-    <label>E-mail:</label>
-    <input type="email" [(ngModel)]="editUser.email" />
-
-    <label>Grupy:</label>
-    <input type="text" [(ngModel)]="editUser.groups" />
-
-    <label>Rola:</label>
-    <select [(ngModel)]="editUser.role">
-      <option value="Uczeń">Uczeń</option>
-      <option value="Nauczyciel">Nauczyciel</option>
-      <option value="Admin">Admin</option>
-    </select>
-
-    <div class="modal-buttons">
-      <button (click)="saveUserEdits()">Zapisz</button>
-      <button (click)="closeEditModal()">Anuluj</button>
-    </div>
-  </div>
-</div>
-
-<!-- Create user modal -->
-<div class="modal-backdrop" *ngIf="showCreateModal">
-  <div class="modal">
-    <h2>Dodaj nowego użytkownika</h2>
-
-    <label>Imię:</label>
-    <input type="text" [(ngModel)]="newUser.firstName" />
-
-    <label>Nazwisko:</label>
-    <input type="text" [(ngModel)]="newUser.lastName" />
-
-    <label>E-mail:</label>
-    <input type="email" [(ngModel)]="newUser.email" />
-
-    <label>Rola:</label>
-    <select [(ngModel)]="newUser.role">
-      <option value="Uczeń">Uczeń</option>
-      <option value="Nauczyciel">Nauczyciel</option>
-      <option value="Admin">Admin</option>
-    </select>
-
-    <div class="modal-buttons">
-      <button (click)="createUser()">Zapisz</button>
-      <button (click)="closeCreateModal()">Anuluj</button>
     </div>
   </div>
 </div>

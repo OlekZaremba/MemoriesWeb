@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using MemoriesBack.DTO;
 using MemoriesBack.Entities;
 using MemoriesBack.Repository;
+using MemoriesBack.Data;
 using EntityUser = MemoriesBack.Entities.User;
-
 
 namespace MemoriesBack.Controller
 {
@@ -20,17 +21,20 @@ namespace MemoriesBack.Controller
         private readonly GroupMemberRepository _groupMemberRepo;
         private readonly UserGroupRepository _userGroupRepo;
         private readonly SensitiveDataRepository _sensitiveRepo;
+        private readonly AppDbContext _context;
 
         public UserController(
             UserRepository userRepo,
             GroupMemberRepository groupMemberRepo,
             UserGroupRepository userGroupRepo,
-            SensitiveDataRepository sensitiveRepo)
+            SensitiveDataRepository sensitiveRepo,
+            AppDbContext context)
         {
             _userRepo = userRepo;
             _groupMemberRepo = groupMemberRepo;
             _userGroupRepo = userGroupRepo;
             _sensitiveRepo = sensitiveRepo;
+            _context = context;
         }
 
         [HttpPut("{id}/profile-image")]
@@ -43,20 +47,18 @@ namespace MemoriesBack.Controller
             {
                 return BadRequest("Brak obrazu");
             }
-            
+
             var base64Only = b64.Contains("base64,") ? b64.Split(",")[1] : b64;
 
             try
             {
-                _ = Convert.FromBase64String(base64Only); 
-                user.Image = b64; 
+                _ = Convert.FromBase64String(base64Only);
+                user.Image = b64;
             }
             catch
             {
                 return BadRequest("Nieprawidłowy format obrazu");
             }
-
-
 
             await _userRepo.UpdateAsync(user);
             return Ok();
@@ -68,7 +70,7 @@ namespace MemoriesBack.Controller
             var users = await _userRepo.GetAllAsync();
             var teachers = users
                 .Where(u => u.UserRole == EntityUser.Role.T)
-                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole))
+                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole.ToString()))
                 .ToList();
 
             return Ok(teachers);
@@ -87,12 +89,18 @@ namespace MemoriesBack.Controller
 
             return Ok(dtos);
         }
+
         [HttpGet]
         public async Task<ActionResult<List<UserDTO>>> GetAllUsers()
         {
+            var role = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+            if (role != "A")
+                return Forbid("Dostęp tylko dla administratora.");
+
             var users = await _userRepo.GetAllAsync();
             var dtos = users
-                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole))
+                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole.ToString()))
                 .ToList();
 
             return Ok(dtos);
@@ -108,7 +116,6 @@ namespace MemoriesBack.Controller
                 ?? throw new ArgumentException("Brak danych wrażliwych");
 
             var imageBase64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
-
 
             var dto = new EditUserResponse(
                 user.Id,
@@ -141,7 +148,7 @@ namespace MemoriesBack.Controller
 
             return Ok("Użytkownik zaktualizowany");
         }
-        
+
         [HttpGet("{id}/profile-image")]
         public async Task<IActionResult> GetProfileImage(int id)
         {
@@ -154,5 +161,39 @@ namespace MemoriesBack.Controller
             return Ok(new { image = base64 });
         }
 
+        [HttpGet("student/{studentId}/teachers")]
+        public async Task<ActionResult<List<UserDTO>>> GetTeachersForStudentAsync(int studentId)
+        {
+            var studentGroupMembers = await _groupMemberRepo.GetAllByUserIdAsync(studentId);
+            var studentGroupMemberIds = studentGroupMembers.Select(gm => gm.Id).ToList();
+
+            var classIds = await _context.GroupMemberClasses
+                .Where(gmc => studentGroupMemberIds.Contains(gmc.GroupMemberId))
+                .Select(gmc => gmc.SchoolClassId)
+                .Distinct()
+                .ToListAsync();
+
+            var teacherGroupClasses = await _context.GroupMemberClasses
+                .Include(gmc => gmc.GroupMember)
+                    .ThenInclude(gm => gm.User)
+                .Include(gmc => gmc.SchoolClass)
+                .Where(gmc => classIds.Contains(gmc.SchoolClassId))
+                .ToListAsync();
+
+            var uniqueTeachers = teacherGroupClasses
+                .Where(gmc => gmc.GroupMember.User.UserRole == EntityUser.Role.T)
+                .GroupBy(gmc => gmc.GroupMember.User.Id)
+                .Select(g => g.First())
+                .Select(gmc => new UserDTO(
+                    gmc.GroupMember.User.Id,
+                    gmc.GroupMember.User.Name,
+                    gmc.GroupMember.User.Surname,
+                    gmc.GroupMember.User.UserRole.ToString(),
+                    gmc.SchoolClass.ClassName
+                ))
+                .ToList();
+
+            return Ok(uniqueTeachers);
+        }
     }
 }

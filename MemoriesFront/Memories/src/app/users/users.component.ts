@@ -1,6 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, inject } from '@angular/core';
 import { NgIf, NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+
+const BASE_URL = 'http://localhost:5017';
 
 @Component({
   selector: 'app-users',
@@ -9,11 +12,12 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
-export class UsersComponent {
-  @Output() navigateTo = new EventEmitter<string>();
-  // MODAL: RESET HASŁA
+export class UsersComponent implements OnInit {
+  @Output() navigateTo = new EventEmitter<{ view: string, groupId: number }>();
+
   showResetModal = false;
   selectedEmail: string = '';
+
   showEditModal = false;
   editUser = {
     firstName: '',
@@ -23,7 +27,6 @@ export class UsersComponent {
     groups: ''
   };
 
-  // MODAL: TWORZENIE UŻYTKOWNIKA
   showCreateModal = false;
   newUser = {
     firstName: '',
@@ -32,8 +35,58 @@ export class UsersComponent {
     role: ''
   };
 
-  goToGroupUsersView() {
-    this.navigateTo.emit('group-users');
+  showAssignModal = false;
+  selectedUserName = '';
+  availableClasses = ['Klasa 1', 'Klasa 2', 'Klasa 3'];
+  selectedClasses: string[] = [];
+
+  userRole: string | null = null;
+  userId: number = 0;
+
+  teachersForStudent: any[] = [];
+  teacherGroups: any[] = [];
+  allUsers: any[] = [];
+
+  searchTerm: string = '';
+
+  private http = inject(HttpClient);
+
+  ngOnInit(): void {
+    this.userRole = sessionStorage.getItem('userRole');
+    this.userId = Number(sessionStorage.getItem('userId'));
+
+    if (this.userRole === 'S') {
+      this.loadTeachersForStudent();
+    } else if (this.userRole === 'T') {
+      this.loadGroupsForTeacher();
+    } else if (this.userRole === 'A') {
+      this.loadAllUsers();
+    }
+  }
+
+  loadTeachersForStudent() {
+    this.http.get<any[]>(`${BASE_URL}/api/users/student/${this.userId}/teachers`)
+      .subscribe(data => {
+        this.teachersForStudent = data;
+      });
+  }
+
+  loadGroupsForTeacher() {
+    this.http.get<any[]>(`${BASE_URL}/api/users/${this.userId}/groups`)
+      .subscribe(data => {
+        this.teacherGroups = data;
+      });
+  }
+
+  loadAllUsers() {
+    this.http.get<any[]>(`${BASE_URL}/api/users`)
+      .subscribe(data => {
+        this.allUsers = data;
+      });
+  }
+
+  goToGroupUsersView(groupId: number) {
+    this.navigateTo.emit({ view: 'group-users', groupId });
   }
 
   openResetModal(email: string) {
@@ -47,15 +100,8 @@ export class UsersComponent {
 
   resetPassword() {
     console.log(`Resetuję hasło dla: ${this.selectedEmail}`);
-    // tutaj dodasz wywołanie do serwisu/resetu
     this.closeResetModal();
   }
-
-  // MODAL: PRZYPISYWANIE DO GRUP
-  showAssignModal = false;
-  selectedUserName = '';
-  availableClasses = ['Klasa 1', 'Klasa 2', 'Klasa 3'];
-  selectedClasses: string[] = [];
 
   openAssignModal(userName: string) {
     this.selectedUserName = userName;
@@ -79,9 +125,21 @@ export class UsersComponent {
     console.log(`✅ Przypisuję ${this.selectedUserName} do klas:`, this.selectedClasses);
     this.closeAssignModal();
   }
+
   openEditModal(user: any) {
     this.editUser = { ...user };
     this.showEditModal = true;
+  }
+
+  prepareUserForEdit(user: any) {
+    const editData = {
+      firstName: user.name,
+      lastName: user.surname,
+      email: '',
+      role: user.role,
+      groups: ''
+    };
+    this.openEditModal(editData);
   }
 
   closeEditModal() {
@@ -109,8 +167,22 @@ export class UsersComponent {
 
   createUser() {
     console.log('👤 Tworzenie użytkownika:', this.newUser);
-    // Tutaj wywołanie do backendu
     this.closeCreateModal();
+  }
+
+  filteredUsers() {
+    return this.allUsers.filter(u =>
+      `${u.name} ${u.surname}`.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+  mapRole(role: string): string {
+    switch (role) {
+      case 'S': return 'Uczeń';
+      case 'T': return 'Nauczyciel';
+      case 'A': return 'Admin';
+      default: return '';
+    }
   }
 
   protected readonly HTMLInputElement = HTMLInputElement;
