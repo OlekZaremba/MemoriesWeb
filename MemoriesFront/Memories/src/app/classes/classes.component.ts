@@ -1,6 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgForOf } from '@angular/common'
+import { NgIf, NgForOf } from '@angular/common';
+import { environment } from '../../environments/environment';
+
+interface SubjectDTO {
+  id: number;
+  className: string;
+}
 
 @Component({
   selector: 'app-classes',
@@ -9,12 +16,27 @@ import { NgIf, NgForOf } from '@angular/common'
   templateUrl: './classes.component.html',
   styleUrl: './classes.component.css'
 })
-export class ClassesComponent {
+export class ClassesComponent implements OnInit {
+  constructor(private http: HttpClient) {}
+
   showAddSubjectModal = false;
   newSubjectName: string = '';
   showAssignTeacherModal = false;
   availableTeachers = ['Jan Kowalski', 'Anna Nowak', 'Tomasz Zięba'];
   selectedTeachers: string[] = [];
+
+  subjects: SubjectDTO[] = [];
+
+  ngOnInit(): void {
+    this.loadSubjects();
+  }
+
+  loadSubjects(): void {
+    this.http.get<SubjectDTO[]>(`${environment.apiUrl}/classes`).subscribe({
+      next: (res) => this.subjects = res,
+      error: (err) => console.error('Błąd przy pobieraniu przedmiotów:', err)
+    });
+  }
 
   openAddSubjectModal() {
     this.newSubjectName = '';
@@ -26,15 +48,27 @@ export class ClassesComponent {
   }
 
   addSubject() {
-    if (this.newSubjectName.trim()) {
-      console.log('📚 Dodano przedmiot:', this.newSubjectName);
-      // tutaj w przyszłości wywołanie do backendu
-    }
-    this.closeAddSubjectModal();
+    const trimmedName = this.newSubjectName.trim();
+    if (!trimmedName) return;
+
+    const body = {
+      className: trimmedName
+    };
+
+    this.http.post(`${environment.apiUrl}/classes`, body).subscribe({
+      next: () => {
+        console.log('Przedmiot dodany:', trimmedName);
+        this.loadSubjects();
+        this.closeAddSubjectModal();
+      },
+      error: (err) => {
+        console.error('Błąd przy dodawaniu przedmiotu:', err);
+      }
+    });
   }
 
   openAssignTeacherModal() {
-    this.selectedTeachers = []; // reset
+    this.selectedTeachers = [];
     this.showAssignTeacherModal = true;
   }
 
@@ -51,7 +85,7 @@ export class ClassesComponent {
   }
 
   assignTeachers() {
-    console.log('📌 Przypisano nauczycieli:', this.selectedTeachers);
+    console.log('Przypisano nauczycieli:', this.selectedTeachers);
     this.closeAssignTeacherModal();
   }
 }
