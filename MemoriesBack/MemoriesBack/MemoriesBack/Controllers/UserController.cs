@@ -93,10 +93,10 @@ namespace MemoriesBack.Controller
         [HttpGet]
         public async Task<ActionResult<List<UserDTO>>> GetAllUsers()
         {
-            var role = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+            //var role = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-            if (role != "A")
-                return Forbid("Dostęp tylko dla administratora.");
+            //if (role != "A")
+              //  return Forbid("Dostęp tylko dla administratora.");
 
             var users = await _userRepo.GetAllAsync();
             var dtos = users
