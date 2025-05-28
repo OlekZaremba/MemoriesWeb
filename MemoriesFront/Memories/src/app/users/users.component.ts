@@ -53,6 +53,7 @@ export class UsersComponent implements OnInit {
   allUsers: any[] = [];
 
   searchTerm: string = '';
+  editedUserId: number | null = null;
 
   private http = inject(HttpClient);
 
@@ -111,10 +112,43 @@ export class UsersComponent implements OnInit {
     this.showResetModal = false;
   }
 
-  resetPassword() {
-    console.log(`Resetuję hasło dla: ${this.selectedEmail}`);
-    this.closeResetModal();
+  loadUserDetails(userId: number) {
+    this.http.get<any>(`${BASE_URL}/api/users/${userId}`).subscribe(user => {
+      this.editUser = {
+        firstName: user.name,
+        lastName: user.surname,
+        email: user.login, // login = e-mail
+        role: this.mapRole(user.role),
+        groups: '',
+      };
+      this.editedUserId = user.id;
+      this.showEditModal = true;
+    });
   }
+
+
+
+  resetPassword() {
+    if (!this.selectedEmail) {
+      alert("Brak adresu e-mail.");
+      return;
+    }
+
+    this.http.post(`${BASE_URL}/api/auth/request-password-reset`, {
+      login: this.selectedEmail
+    }, { responseType: 'text' }) // oczekujemy tekstu, nie JSON-a
+      .subscribe({
+        next: (msg) => {
+          alert("Link resetujący został wysłany.");
+          this.closeResetModal();
+        },
+        error: (err) => {
+          console.error("❌ Błąd resetowania hasła:", err);
+          alert("Nie udało się zresetować hasła.");
+        }
+      });
+  }
+
 
   openAssignModal(userName: string) {
     this.selectedUserName = userName;
@@ -145,24 +179,47 @@ export class UsersComponent implements OnInit {
   }
 
   prepareUserForEdit(user: any) {
-    const editData = {
-      firstName: user.name,
-      lastName: user.surname,
-      email: '',
-      role: user.role,
-      groups: ''
-    };
-    this.openEditModal(editData);
+    this.loadUserDetails(user.id);
   }
+
 
   closeEditModal() {
     this.showEditModal = false;
   }
 
   saveUserEdits() {
-    console.log('💾 Zapisano dane użytkownika:', this.editUser);
-    this.closeEditModal();
+    if (!this.editedUserId) {
+      console.error("❌ Brak ID użytkownika do edycji.");
+      return;
+    }
+
+    const roleMap: Record<string, string> = {
+      "Uczeń": "S",
+      "Nauczyciel": "T",
+      "Admin": "A"
+    };
+
+    const payload = {
+      login: this.editUser.email,
+      email: this.editUser.email,
+      name: this.editUser.firstName,
+      surname: this.editUser.lastName,
+      role: roleMap[this.editUser.role]
+    };
+
+    this.http.put(`${BASE_URL}/api/users/${this.editedUserId}`, payload, { responseType: 'text' }).subscribe({
+      next: () => {
+        alert("✅ Dane użytkownika zostały zaktualizowane.");
+        this.closeEditModal();
+        this.loadAllUsers(); // odśwież listę
+      },
+      error: (err) => {
+        console.error("❌ Błąd aktualizacji użytkownika:", err);
+        alert("❌ Nie udało się zaktualizować użytkownika.");
+      }
+    });
   }
+
 
   openCreateModal() {
     this.newUser = {

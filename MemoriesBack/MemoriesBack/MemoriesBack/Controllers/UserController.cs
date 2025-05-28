@@ -93,18 +93,20 @@ namespace MemoriesBack.Controller
         [HttpGet]
         public async Task<ActionResult<List<UserDTO>>> GetAllUsers()
         {
-            //var role = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-
-            //if (role != "A")
-              //  return Forbid("Dostęp tylko dla administratora.");
-
             var users = await _userRepo.GetAllAsync();
+            var sensitives = await _sensitiveRepo.GetAllAsync();
+
             var dtos = users
-                .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole.ToString()))
+                .Select(u =>
+                {
+                    var email = sensitives.FirstOrDefault(s => s.UserId == u.Id)?.Email;
+                    return new UserDTO(u.Id, u.Name, u.Surname, u.UserRole.ToString(), email);
+                })
                 .ToList();
 
             return Ok(dtos);
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EditUserResponse>> GetUser(int id)
@@ -120,6 +122,7 @@ namespace MemoriesBack.Controller
             var dto = new EditUserResponse(
                 user.Id,
                 sensitive.Login,
+                sensitive.Email,
                 user.Name,
                 user.Surname,
                 user.UserRole,
@@ -144,6 +147,7 @@ namespace MemoriesBack.Controller
                 ?? throw new ArgumentException("Brak danych wrażliwych");
 
             sensitive.Login = req.Login;
+            sensitive.Email = req.Email;
             await _sensitiveRepo.UpdateAsync(sensitive);
 
             return Ok("Użytkownik zaktualizowany");

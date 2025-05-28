@@ -13,6 +13,11 @@ namespace MemoriesBack.Repository
         {
             _context = context;
         }
+        
+        public async Task<List<SensitiveData>> GetAllAsync()
+        {
+            return await _context.SensitiveData.ToListAsync();
+        }
 
         public async Task<SensitiveData?> GetByLoginAsync(string login)
         {

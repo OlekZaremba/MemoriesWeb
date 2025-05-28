@@ -145,15 +145,9 @@
     <label>E-mail:</label>
     <input type="email" [(ngModel)]="editUser.email" />
 
-    <label>Grupy:</label>
-    <input type="text" [(ngModel)]="editUser.groups" />
-
     <label>Rola:</label>
-    <select [(ngModel)]="editUser.role">
-      <option value="Uczeń">Uczeń</option>
-      <option value="Nauczyciel">Nauczyciel</option>
-      <option value="Admin">Admin</option>
-    </select>
+    <input type="text" [(ngModel)]="editUser.role" disabled />
+
 
     <div class="modal-buttons">
       <button (click)="saveUserEdits()">Zapisz</button>
