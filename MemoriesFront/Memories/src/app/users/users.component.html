@@ -58,8 +58,6 @@
               <tr>
                 <th>Imię</th>
                 <th>Nazwisko</th>
-                <th>Grupy</th>
-                <th>E-mail</th>
                 <th>Rola</th>
                 <th>Resetuj hasło</th>
                 <th>Przypisz do grupy</th>
@@ -70,8 +68,6 @@
               <tr *ngFor="let user of filteredUsers()">
                 <td>{{ user.name }}</td>
                 <td>{{ user.surname }}</td>
-                <td>–</td> <!-- Można uzupełnić później -->
-                <td>–</td> <!-- Można uzupełnić później -->
                 <td>{{ mapRole(user.role) }}</td>
                 <td>
                   <button class="goToGrade" (click)="openResetModal(user.email)">Resetuj</button>
