@@ -57,5 +57,13 @@ namespace MemoriesBack.Repository
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
+        
+        public async Task<List<User>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _context.Users
+                .Where(u => ids.Contains(u.Id))
+                .ToListAsync();
+        }
+
     }
 }

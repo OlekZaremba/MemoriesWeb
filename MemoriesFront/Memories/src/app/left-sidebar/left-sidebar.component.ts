@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import {NgIf} from '@angular/common';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-left-sidebar',
@@ -20,7 +20,9 @@ export class LeftSidebarComponent implements OnInit {
   userRole: string | null = null;
 
   ngOnInit(): void {
-    this.userRole = sessionStorage.getItem('userRole');
+    if (typeof window !== 'undefined') {
+      this.userRole = sessionStorage.getItem('userRole');
+    }
   }
 
   setActive(view: string) {

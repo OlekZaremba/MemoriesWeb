@@ -7,7 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using MemoriesBack.DTO;
 using MemoriesBack.Entities;
 using MemoriesBack.Repository;
+using MemoriesBack.Data;
 using EntityUser = MemoriesBack.Entities.User;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+
 
 
 namespace MemoriesBack.Controller
@@ -21,17 +25,22 @@ namespace MemoriesBack.Controller
         private readonly UserGroupRepository _userGroupRepo;
         private readonly SensitiveDataRepository _sensitiveRepo;
 
+        private readonly AppDbContext _context;
+
         public UserController(
             UserRepository userRepo,
             GroupMemberRepository groupMemberRepo,
             UserGroupRepository userGroupRepo,
-            SensitiveDataRepository sensitiveRepo)
+            SensitiveDataRepository sensitiveRepo,
+            AppDbContext context) 
         {
             _userRepo = userRepo;
             _groupMemberRepo = groupMemberRepo;
             _userGroupRepo = userGroupRepo;
             _sensitiveRepo = sensitiveRepo;
+            _context = context; 
         }
+
 
         [HttpPut("{id}/profile-image")]
         public async Task<IActionResult> UploadProfileImage(int id, [FromBody] Dictionary<string, string> body)
@@ -90,6 +99,11 @@ namespace MemoriesBack.Controller
         [HttpGet]
         public async Task<ActionResult<List<UserDTO>>> GetAllUsers()
         {
+            var role = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+            if (role != "A")
+                return Forbid("Dostęp tylko dla administratora.");
+
             var users = await _userRepo.GetAllAsync();
             var dtos = users
                 .Select(u => new UserDTO(u.Id, u.Name, u.Surname, u.UserRole))
@@ -97,6 +111,7 @@ namespace MemoriesBack.Controller
 
             return Ok(dtos);
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<EditUserResponse>> GetUser(int id)
@@ -152,6 +167,33 @@ namespace MemoriesBack.Controller
             var base64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
 
             return Ok(new { image = base64 });
+        }
+        
+        [HttpGet("student/{studentId}/teachers")]
+        public async Task<ActionResult<List<UserDTO>>> GetTeachersForStudentAsync(int studentId)
+        {
+            var studentGroupMembers = await _groupMemberRepo.GetAllByUserIdAsync(studentId);
+
+            var classIds = await _context.GroupMemberClasses
+                .Where(gmc => studentGroupMembers.Select(sgm => sgm.Id).Contains(gmc.GroupMemberId))
+                .Select(gmc => gmc.SchoolClassId)
+                .Distinct()
+                .ToListAsync();
+
+            var teacherGroupMemberIds = await _context.GroupMemberClasses
+                .Where(gmc => classIds.Contains(gmc.SchoolClassId))
+                .Select(gmc => gmc.GroupMember.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            var teachers = await _userRepo.GetByIdsAsync(teacherGroupMemberIds);
+
+            var dtos = teachers
+                .Where(t => t.UserRole == EntityUser.Role.T)
+                .Select(t => new UserDTO(t.Id, t.Name, t.Surname, t.UserRole))
+                .ToList();
+
+            return Ok(dtos);
         }
 
     }
