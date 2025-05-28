@@ -17,8 +17,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>Matematyka</td>
+            <tr *ngFor="let subject of subjects">
+              <td>{{ subject.className }}</td>
               <td>Brak przypisań</td>
               <td><button class="goToGrade" (click)="openAssignTeacherModal()">Przypisz</button></td>
             </tr>
