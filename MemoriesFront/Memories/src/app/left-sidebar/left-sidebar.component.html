@@ -10,6 +10,6 @@
     <button [class.active]="activeButton === 'plan'" (click)="setActive('plan')"><img src="/event.png">Plan zajęć</button>
     <button *ngIf="userRole === 'S'" [class.active]="activeButton === 'wykresy'" (click)="setActive('wykresy')"><img src="/trend.png">Podsumowanie</button>
 <!--    <button [class.active]="activeButton === 'wykresy'" (click)="setActive('wykresy')"><img src="/trend.png">Podsumowanie</button>-->
-    <button routerLink="/"><img src="/logout.png">Wyloguj</button>
+    <button (click)="logout()"><img src="/logout.png">Wyloguj</button>
   </div>
 </div>
