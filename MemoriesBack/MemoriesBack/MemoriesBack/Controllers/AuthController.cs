@@ -74,7 +74,7 @@ namespace MemoriesBack.Controllers
             }
 
             await _passwordResetService.RequestPasswordReset(login);
-            return Ok("Jeśli konto istnieje, link resetujący został wysłany.");
+            return Ok(new { message = "Jeśli konto istnieje, link resetujący został wysłany." });
         }
 
         [HttpPost("reset-password")]

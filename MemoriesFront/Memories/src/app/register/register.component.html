@@ -3,9 +3,9 @@
     <div class="logo"><img src="logo-white.png" height="150px"></div>
     <div class="inputs">
       <h3>Odzyskaj hasło</h3>
-      <input type="text" placeholder="Wpisz swój adres e-mail...">
+      <input type="text" placeholder="Wpisz swój adres e-mail..." [(ngModel)]="email" />
       <div class="buttons">
-        <button>Zresetuj hasło</button>
+        <button (click)="requestPasswordReset()">Zresetuj hasło</button>
         <button routerLink="/">Powrót</button>
       </div>
       <span>Formularz logowania przeznaczony jest zarówno dla uczniów, jak i nauczycieli</span>
