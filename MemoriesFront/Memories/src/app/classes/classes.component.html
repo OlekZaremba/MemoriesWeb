@@ -1,12 +1,15 @@
 <div class="main">
   <div class="content">
     <div class="grades">
-      <div class="tile ">
+      <div class="tile">
         <h2>Przedmioty</h2>
-        <!--    KOM DLA ADIEGO: Ogólnie to przedmioty są tylko widoczne dla admina, jak nie jesteś adminem to z tego paska po lewej też niech to nie będzie widoczne -->
+
+        <!-- Przycisk: Dodaj przedmiot -->
         <div class="teacher-control-buttons">
           <button (click)="openAddSubjectModal()">Dodaj przedmiot</button>
         </div>
+
+        <!-- Tabela przedmiotów -->
         <div class="student-grades-table">
           <table class="subjects-table">
             <thead>
@@ -19,8 +22,17 @@
             <tbody>
             <tr *ngFor="let subject of subjects">
               <td>{{ subject.className }}</td>
-              <td>Brak przypisań</td>
-              <td><button class="goToGrade" (click)="openAssignTeacherModal()">Przypisz</button></td>
+              <td>
+                <div *ngIf="subject.teachers?.length; else brak">
+                  <div *ngFor="let t of subject.teachers">
+                    {{ t.teacherName }} ({{ t.groupName }})
+                  </div>
+                </div>
+                <ng-template #brak>Brak przypisań</ng-template>
+              </td>
+              <td>
+                <button class="goToGrade" (click)="openAssignTeacherModal(subject.id)">Przypisz</button>
+              </td>
             </tr>
             </tbody>
           </table>
@@ -30,15 +42,13 @@
   </div>
 </div>
 
-
 <!-- Modal: Dodaj przedmiot -->
 <div class="modal-backdrop" *ngIf="showAddSubjectModal">
   <div class="modal">
     <h2>Dodaj przedmiot</h2>
 
-    <label for="subjectName">Nazwa przedmiotu:</label>
+    <label>Nazwa przedmiotu:</label>
     <input
-      id="subjectName"
       type="text"
       [(ngModel)]="newSubjectName"
       placeholder="Wpisz nazwę przedmiotu"
@@ -51,24 +61,29 @@
   </div>
 </div>
 
-<!-- Modal: Przypisz nauczyciela -->
+<!-- Modal: Przypisz przedmiot do nauczyciela w klasie -->
 <div class="modal-backdrop" *ngIf="showAssignTeacherModal">
   <div class="modal">
-    <h2>Przypisz nauczycieli</h2>
+    <h2>Przypisz przedmiot nauczycielowi w klasie</h2>
 
-    <label>Wybierz nauczycieli:</label>
-    <label *ngFor="let teacher of availableTeachers" class="checkbox-row">
-      <input
-        type="checkbox"
-        [checked]="selectedTeachers.includes(teacher)"
-        #cb
-        (change)="toggleTeacher(teacher, cb.checked)"
-      />
-      {{ teacher }}
-    </label>
+    <label>Nauczyciel:</label>
+    <select [(ngModel)]="selectedTeacherId">
+      <option [ngValue]="null" disabled>-- Wybierz nauczyciela --</option>
+      <option *ngFor="let teacher of teachers" [ngValue]="teacher.id">
+        {{ teacher.name }} {{ teacher.surname }}
+      </option>
+    </select>
+
+    <label>Klasa:</label>
+    <select [(ngModel)]="selectedGroupId">
+      <option [ngValue]="null" disabled>-- Wybierz klasę --</option>
+      <option *ngFor="let group of groups" [ngValue]="group.id">
+        {{ group.groupName }}
+      </option>
+    </select>
 
     <div class="modal-buttons">
-      <button (click)="assignTeachers()">Zapisz</button>
+      <button (click)="assignTeacherToGroupAndSubject()">Zapisz</button>
       <button (click)="closeAssignTeacherModal()">Anuluj</button>
     </div>
   </div>

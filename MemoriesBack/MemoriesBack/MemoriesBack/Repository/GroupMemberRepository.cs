@@ -56,5 +56,12 @@ namespace MemoriesBack.Repository
             await _context.GroupMembers.AddAsync(gm);
             await _context.SaveChangesAsync();
         }
+        
+        public async Task<GroupMember?> GetByUserIdAndGroupIdAsync(int userId, int groupId)
+        {
+            return await _context.GroupMembers
+                .FirstOrDefaultAsync(gm => gm.UserId == userId && gm.UserGroupId == groupId);
+        }
+
     }
 }

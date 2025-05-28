@@ -18,8 +18,19 @@ namespace MemoriesBack.Controller
         [HttpPost("teacher/{teacherId}/group/{groupId}")]
         public async Task<IActionResult> AssignTeacherToGroup(int teacherId, int groupId)
         {
-            await _assignmentService.AssignTeacherToGroupAsync(teacherId, groupId);
-            return Ok("Nauczyciel przypisany do grupy.");
+            try
+            {
+                await _assignmentService.AssignTeacherToGroupAsync(teacherId, groupId);
+                return Ok(new { message = "Nauczyciel przypisany do grupy." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
         [HttpPost("teacher/{teacherId}/group/{groupId}/class/{classId}")]
