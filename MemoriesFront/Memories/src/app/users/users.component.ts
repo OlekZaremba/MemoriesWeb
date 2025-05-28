@@ -13,7 +13,7 @@ const BASE_URL = 'http://localhost:5017';
   styleUrl: './users.component.css'
 })
 export class UsersComponent implements OnInit {
-  @Output() navigateTo = new EventEmitter<string>();
+  @Output() navigateTo = new EventEmitter<{ view: string, groupId: number }>();
 
   showResetModal = false;
   selectedEmail: string = '';
@@ -85,8 +85,8 @@ export class UsersComponent implements OnInit {
       });
   }
 
-  goToGroupUsersView() {
-    this.navigateTo.emit('group-users');
+  goToGroupUsersView(groupId: number) {
+    this.navigateTo.emit({ view: 'group-users', groupId });
   }
 
   openResetModal(email: string) {

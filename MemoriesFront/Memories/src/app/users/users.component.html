@@ -16,7 +16,7 @@
             <tbody>
             <tr *ngFor="let teacher of teachersForStudent">
               <td>{{ teacher.name }} {{ teacher.surname }}</td>
-              <td>–</td>
+              <td>{{ teacher.subject }}</td>
             </tr>
             </tbody>
           </table>
@@ -34,7 +34,7 @@
             <tbody>
             <tr *ngFor="let group of teacherGroups">
               <td>{{ group.groupName }}</td>
-              <td><button class="goToGrade" (click)="goToGroupUsersView()">Przeglądaj</button></td>
+              <td><button class="goToGrade" (click)="goToGroupUsersView(group.id)">Przeglądaj</button></td>
             </tr>
             </tbody>
           </table>
@@ -70,8 +70,8 @@
               <tr *ngFor="let user of filteredUsers()">
                 <td>{{ user.name }}</td>
                 <td>{{ user.surname }}</td>
-                <td>–</td> <!-- Możesz uzupełnić w przyszłości -->
-                <td>–</td> <!-- Możesz uzupełnić w przyszłości -->
+                <td>–</td> <!-- Można uzupełnić później -->
+                <td>–</td> <!-- Można uzupełnić później -->
                 <td>{{ mapRole(user.role) }}</td>
                 <td>
                   <button class="goToGrade" (click)="openResetModal(user.email)">Resetuj</button>
