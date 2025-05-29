@@ -71,19 +71,25 @@ export class ScheduleComponent implements OnInit {
   }
 
   loadLessonsForDate(date: string): void {
-    const groupId = sessionStorage.getItem('groupId');
     const from = date;
     const to = date;
+    const role = sessionStorage.getItem('userRole');
+    const userId = sessionStorage.getItem('userId');
+    const groupId = sessionStorage.getItem('groupId');
 
-    this.http.get<Lesson[]>(`${BASE_URL}/api/schedules/group/${groupId}?from=${from}&to=${to}`)
-      .subscribe(data => {
-        this.lessons = data;
-      });
+    if (role === 'T') {
+      this.http.get<Lesson[]>(`${BASE_URL}/api/schedules/teacher/${userId}?from=${from}&to=${to}`)
+        .subscribe(data => {
+          this.lessons = data;
+        });
+    } else {
+      this.http.get<Lesson[]>(`${BASE_URL}/api/schedules/group/${groupId}?from=${from}&to=${to}`)
+        .subscribe(data => {
+          this.lessons = data;
+        });
+    }
   }
 
-  getLessonsForSelectedDate(): Lesson[] {
-    return this.lessons;
-  }
 
   openEditModal() {
     this.loadAvailableClasses();
