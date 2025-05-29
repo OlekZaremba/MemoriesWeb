@@ -18,7 +18,7 @@ interface ClassTeacherDTO {
 }
 
 interface GroupMemberDTO {
-  id: number;
+  groupMemberId: number;
   teacherName: string;
   groupName: string;
 }
@@ -103,10 +103,6 @@ export class ClassesComponent implements OnInit {
   }
 
   assignSubjectToGroupMember() {
-    console.log('Zapisz kliknięty');
-    console.log('selectedGroupMemberId:', this.selectedGroupMemberId);
-    console.log('selectedSubjectId:', this.selectedSubjectId);
-
     if (!this.selectedGroupMemberId || !this.selectedSubjectId) {
       console.warn('Nie wybrano wszystkich wymaganych pól.');
       return;
