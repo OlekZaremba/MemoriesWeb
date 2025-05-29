@@ -23,7 +23,7 @@ interface SubjectDTO {
   styleUrl: './grades.component.css'
 })
 export class GradesComponent implements OnInit {
-  @Output() navigateTo = new EventEmitter<string>();
+  @Output() navigateTo = new EventEmitter<string | { view: string, groupId?: number }>();
   userRole: string | null = null;
   teacherGroups: GroupDTO[] = [];
   studentSubjects: SubjectDTO[] = [];
@@ -70,7 +70,7 @@ export class GradesComponent implements OnInit {
   }
 
   goToGroupGrades(groupId: number) {
-    this.navigateTo.emit(`group-grades:${groupId}`);
+    this.navigateTo.emit({ view: 'group-grades', groupId });
   }
 
   showSubjectGrades(subjectId: number) {

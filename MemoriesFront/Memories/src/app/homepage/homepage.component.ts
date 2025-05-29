@@ -61,7 +61,7 @@ export class HomepageComponent implements OnInit {
     } else {
       this.activeView = view.view;
 
-      if (view.view === 'group-users') {
+      if (view.view === 'group-users' || view.view === 'group-grades') {
         this.selectedGroupId = view.groupId ?? null;
       } else {
         this.selectedGroupId = null;
@@ -72,7 +72,7 @@ export class HomepageComponent implements OnInit {
       if (
         this.activeView === 'grade-view' ||
         this.activeView === 'add-grade' ||
-        this.activeView.startsWith('group-grades')
+        this.activeView === 'group-grades'
       ) {
         this.leftSidebar.setActive('oceny');
       } else if (this.activeView === 'uzytkownicy' || this.activeView === 'group-users') {
