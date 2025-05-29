@@ -24,15 +24,37 @@ namespace MemoriesBack.Service
 
         public async Task<ScheduleResponseDTO> CreateLessonAsync(ScheduleRequestDTO dto)
         {
-            var gmc = await _groupMemberClassRepository.GetByIdAsync(dto.AssignmentId)
-                ?? throw new ArgumentException("Assignment not found");
+            var start = TimeSpan.Parse(dto.StartTime);
+            var end = TimeSpan.Parse(dto.EndTime);
+    
+            Console.WriteLine("▶ CreateLessonAsync called");
+            Console.WriteLine($"assignmentId = {dto.AssignmentId}");
+            Console.WriteLine($"lessonDate = {dto.LessonDate}");
+            Console.WriteLine($"startTime = {dto.StartTime}");
+            Console.WriteLine($"endTime = {dto.EndTime}");
+
+            var gmc = await _groupMemberClassRepository.GetByIdAsync(dto.AssignmentId);
+
+            if (gmc == null)
+            {
+                Console.WriteLine("❌ GroupMemberClass not found for assignmentId = " + dto.AssignmentId);
+                throw new ArgumentException("Assignment not found");
+            }
+
+            Console.WriteLine("✅ GroupMemberClass found:");
+            Console.WriteLine($"   ID = {gmc.Id}");
+            Console.WriteLine($"   GroupMemberId = {gmc.GroupMember?.Id}");
+            Console.WriteLine($"   User = {gmc.GroupMember?.User?.Name} {gmc.GroupMember?.User?.Surname}");
+            Console.WriteLine($"   Group = {gmc.GroupMember?.UserGroup?.GroupName}");
+            Console.WriteLine($"   Class = {gmc.SchoolClass?.ClassName}");
 
             var first = new Schedule
             {
                 GroupMemberClass = gmc,
+                GroupMemberClassId = gmc.Id,
                 LessonDate = dto.LessonDate,
-                StartTime = dto.StartTime,
-                EndTime = dto.EndTime,
+                StartTime = start,
+                EndTime = end,
                 Generated = false
             };
 
@@ -46,9 +68,10 @@ namespace MemoriesBack.Service
                     var nextSchedule = new Schedule
                     {
                         GroupMemberClass = gmc,
+                        GroupMemberClassId = gmc.Id,
                         LessonDate = nextDate,
-                        StartTime = dto.StartTime,
-                        EndTime = dto.EndTime,
+                        StartTime = start,
+                        EndTime = end,
                         Generated = true
                     };
 
@@ -58,6 +81,7 @@ namespace MemoriesBack.Service
 
             return MapToDto(first);
         }
+
 
         public async Task<List<ScheduleResponseDTO>> GetScheduleForGroupAsync(int groupId, DateTime from, DateTime to)
         {

@@ -4,19 +4,18 @@
       <div class="tile">
         <h2>Plan zajęć</h2>
         <div class="teacher-control-buttons">
-          <input type="date" [(ngModel)]="selectedDate" />
-<!--          przycisk zmiana planu widoczny tylko dla admina-->
-          <button (click)="openEditModal()">Zmiana planu</button>
+          <input type="date" [(ngModel)]="selectedDate" (change)="loadLessonsForDate(selectedDate)" />
+          <button *ngIf="isAdmin" (click)="openEditModal()">Zmiana planu</button>
         </div>
 
         <!-- Lista lekcji -->
         <div class="schedule-list">
-          <div class="lesson-item" *ngFor="let lesson of getLessonsForSelectedDate()">
+          <div class="lesson-item" *ngFor="let lesson of lessons">
             <div class="lesson-header">
-              <span class="subject">{{ lesson.subject }}</span>
+              <span class="subject">{{ lesson.subjectName }}</span>
               <span class="time">{{ lesson.startTime }} – {{ lesson.endTime }}</span>
             </div>
-            <div class="teacher">Prowadzący: {{ lesson.teacher }}</div>
+            <div class="teacher">Prowadzący: {{ lesson.teacherName }}</div>
           </div>
         </div>
       </div>
@@ -24,20 +23,21 @@
   </div>
 </div>
 
-
 <!-- Modal: Edycja planu zajęć -->
 <div class="modal-backdrop" *ngIf="showEditModal">
   <div class="modal">
     <h2>Edycja planu zajęć</h2>
 
     <label>Wybierz klasę:</label>
-    <select [(ngModel)]="editLesson.class">
-      <option *ngFor="let cls of availableClasses" [value]="cls">{{ cls }}</option>
+    <select [(ngModel)]="editLesson.classId">
+      <option *ngFor="let cls of availableClasses" [value]="cls.id">{{ cls.groupName }}</option>
     </select>
 
     <label>Wybierz nauczyciela z przedmiotem:</label>
-    <select [(ngModel)]="editLesson.teacher">
-      <option *ngFor="let t of availableTeachers" [value]="t">{{ t }}</option>
+    <select [(ngModel)]="editLesson.assignmentId">
+      <option *ngFor="let t of availableAssignments" [value]="t.assignmentId">
+      {{ t.teacherName }} - {{ t.subjectName }}
+      </option>
     </select>
 
     <label>Data:</label>

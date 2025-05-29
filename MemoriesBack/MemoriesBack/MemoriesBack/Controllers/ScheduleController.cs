@@ -22,6 +22,7 @@ namespace MemoriesBack.Controller
         [HttpPost]
         public async Task<ActionResult<ScheduleResponseDTO>> CreateLesson([FromBody] ScheduleRequestDTO dto)
         {
+            Console.WriteLine("▶ [CONTROLLER] POST /api/schedules");
             var result = await _scheduleService.CreateLessonAsync(dto);
             return Ok(result);
         }
@@ -55,5 +56,6 @@ namespace MemoriesBack.Controller
             var result = await _scheduleService.GetScheduleInDateRangeAsync(from, to);
             return Ok(result);
         }
+
     }
 }

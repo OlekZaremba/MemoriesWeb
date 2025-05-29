@@ -30,13 +30,16 @@ namespace MemoriesBack.Controller
         {
             var user = gmc.GroupMember.User;
             var schoolClass = gmc.SchoolClass;
+            var groupName = gmc.GroupMember.UserGroup?.GroupName ?? "Brak klasy";
 
             return new AssignmentDTO(
                 gmc.Id,
-                $"{user.Name} {user.Surname}",
-                schoolClass.Id,
-                schoolClass.ClassName
+                $"{user.Name} {user.Surname}",     
+                schoolClass.ClassName,             
+                gmc.GroupMember.UserGroupId,       
+                groupName                          
             );
         }
+
     }
 }

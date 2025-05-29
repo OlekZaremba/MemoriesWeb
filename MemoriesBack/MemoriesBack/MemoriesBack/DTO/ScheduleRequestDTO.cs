@@ -4,9 +4,8 @@
     {
         public int AssignmentId { get; set; }
         public DateTime LessonDate { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
-
-        public ScheduleRequestDTO() { }
+        public string StartTime { get; set; } = "";
+        public string EndTime { get; set; } = "";
     }
+
 }

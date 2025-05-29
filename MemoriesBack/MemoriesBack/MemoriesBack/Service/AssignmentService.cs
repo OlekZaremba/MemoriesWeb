@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MemoriesBack.Entities;
 using MemoriesBack.Repository;
+using MemoriesBack.DTO;
 
 namespace MemoriesBack.Service
 {
@@ -14,6 +15,7 @@ namespace MemoriesBack.Service
         private readonly GroupMemberRepository _groupMemberRepo;
         private readonly SchoolClassRepository _classRepo;
         private readonly GroupMemberClassRepository _gmClassRepo;
+        
 
         public AssignmentService(
             UserRepository userRepo,
@@ -87,6 +89,29 @@ namespace MemoriesBack.Service
 
             var assignments = await _gmClassRepo.GetAllByGroupMemberIdAsync(gm.Id);
             return assignments.Select(a => a.SchoolClass).ToList();
+        }
+        
+        public async Task<List<AssignmentDTO>> GetAllAssignmentsAsync()
+        {
+            var assignments = await _gmClassRepo.GetAllAssignmentsWithClassAndTeacher();
+
+            return assignments
+                .GroupBy(gmc => gmc.GroupMemberId)
+                .Select(g =>
+                {
+                    var first = g.First();
+                    var teacherName = $"{first.GroupMember.User.Name} {first.GroupMember.User.Surname}";
+                    var subjectName = first.SchoolClass.ClassName; // <--- ważne
+
+                    return new AssignmentDTO(
+                        assignmentId: first.Id,
+                        teacherName: teacherName,
+                        subjectName: subjectName,
+                        classId: first.SchoolClass.Id,
+                        className: subjectName
+                    );
+                })
+                .ToList();
         }
     }
 }

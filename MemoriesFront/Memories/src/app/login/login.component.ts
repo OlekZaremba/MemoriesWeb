@@ -30,8 +30,6 @@ export class LoginComponent {
       password: this.password
     };
 
-    console.log('Wysyłam dane logowania:', body); // Dodaj ten log
-
     this.http.post<any>(`${environment.apiUrl}/auth/login`, body).subscribe({
       next: (resp) => {
         sessionStorage.setItem('userId', resp.id);
@@ -40,6 +38,10 @@ export class LoginComponent {
         sessionStorage.setItem('userImage', resp.image ?? '');
         sessionStorage.setItem('userClassName', resp.className ?? '');
 
+        if (resp.groupId) {
+          sessionStorage.setItem('groupId', resp.groupId.toString());
+        }
+
         this.router.navigate(['/homepage']);
       },
       error: () => {
@@ -47,5 +49,4 @@ export class LoginComponent {
       }
     });
   }
-
 }

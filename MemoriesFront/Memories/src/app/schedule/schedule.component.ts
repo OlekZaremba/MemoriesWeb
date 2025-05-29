@@ -1,6 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgForOf, NgIf } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+
+const BASE_URL = 'http://localhost:5017';
+
+interface Lesson {
+  id: number;
+  assignmentId: number;
+  lessonDate: string;
+  startTime: string;
+  endTime: string;
+  teacherName: string;
+  subjectName: string;
+  groupName: string;
+}
+
+interface Assignment {
+  assignmentId: number;
+  teacherName: string;
+  subjectName: string;
+}
+
+interface ClassGroup {
+  id: number;
+  groupName: string;
+}
 
 @Component({
   selector: 'app-schedule',
@@ -9,69 +34,102 @@ import { NgForOf, NgIf } from '@angular/common';
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.css',
 })
-export class ScheduleComponent {
+export class ScheduleComponent implements OnInit {
+
+  isAdmin: boolean = false;
+
   selectedDate = this.formatDate(new Date());
   showEditModal = false;
 
-  lessons = [
-    {
-      date: this.selectedDate, // DZIŚ
-      subject: 'Matematyka',
-      teacher: 'Jan Kowalski',
-      startTime: '08:00',
-      endTime: '08:45',
-    },
-    {
-      date: this.selectedDate, // DZIŚ
-      subject: 'Fizyka',
-      teacher: 'Anna Nowak',
-      startTime: '09:00',
-      endTime: '09:45',
-    },
-    {
-      date: this.selectedDate, // DZIŚ
-      subject: 'Informatyka',
-      teacher: 'Tomasz Zięba',
-      startTime: '10:00',
-      endTime: '10:45',
-    },
-  ];
+  lessons: Lesson[] = [];
 
-  availableClasses = ['Klasa 1A', 'Klasa 2B', 'Klasa 3C'];
-
-  availableTeachers = [
-    'Jan Kowalski - Matematyka',
-    'Anna Nowak - Fizyka',
-    'Tomasz Zięba - Biologia'
-  ];
+  availableClasses: ClassGroup[] = [];
+  availableAssignments: Assignment[] = [];
 
   editLesson = {
-    class: '',
-    teacher: '',
+    classId: null as number | null,
+    assignmentId: null as number | null,
     date: this.formatDate(new Date()),
     startTime: '',
     endTime: ''
   };
 
-  saveLesson() {
-    console.log('💾 Zapisuję nową lekcję:', this.editLesson);
-    this.closeEditModal();
-  }
+  private http = inject(HttpClient);
 
+  ngOnInit(): void {
+    const role = sessionStorage.getItem('userRole');
+    this.isAdmin = role === 'A';
+    this.loadLessonsForDate(this.selectedDate);
+  }
 
   formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
 
-  getLessonsForSelectedDate() {
-    return this.lessons.filter(lesson => lesson.date === this.selectedDate);
+  onDateChange() {
+    this.loadLessonsForDate(this.selectedDate);
+  }
+
+  loadLessonsForDate(date: string): void {
+    const groupId = sessionStorage.getItem('groupId');
+    const from = date;
+    const to = date;
+
+    this.http.get<Lesson[]>(`${BASE_URL}/api/schedules/group/${groupId}?from=${from}&to=${to}`)
+      .subscribe(data => {
+        this.lessons = data;
+      });
+  }
+
+
+  getLessonsForSelectedDate(): Lesson[] {
+    return this.lessons;
   }
 
   openEditModal() {
+    this.loadAvailableClasses();
+    this.loadAvailableAssignments();
     this.showEditModal = true;
   }
 
   closeEditModal() {
     this.showEditModal = false;
+  }
+
+  saveLesson() {
+    const payload = {
+      assignmentId: Number(this.editLesson.assignmentId),
+      lessonDate: this.editLesson.date,
+      startTime: this.editLesson.startTime,
+      endTime: this.editLesson.endTime
+    };
+
+    console.log("Payload do wysłania:", payload);
+
+    this.http.post(`${BASE_URL}/api/schedules`, payload)
+      .subscribe({
+        next: () => {
+          alert("✅ Lekcja zapisana");
+          this.closeEditModal();
+          this.loadLessonsForDate(this.selectedDate);
+        },
+        error: () => {
+          alert("❌ Nie udało się zapisać lekcji");
+        }
+      });
+  }
+
+  loadAvailableClasses() {
+    this.http.get<ClassGroup[]>(`${BASE_URL}/api/groups`)
+      .subscribe(data => {
+        this.availableClasses = data;
+      });
+  }
+
+  loadAvailableAssignments() {
+    this.http.get<Assignment[]>(`${BASE_URL}/api/groups/assignments`)
+      .subscribe(data => {
+        this.availableAssignments = data;
+      });
   }
 }

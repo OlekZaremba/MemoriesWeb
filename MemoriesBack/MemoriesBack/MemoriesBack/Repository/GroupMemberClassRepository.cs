@@ -90,5 +90,15 @@ namespace MemoriesBack.Repository
                 .ThenInclude(gm => gm.UserGroup)
                 .ToListAsync();
         }
+        
+        public async Task<List<GroupMemberClass>> GetAllAssignmentsWithClassAndTeacher()
+        {
+            return await _context.GroupMemberClasses
+                .Include(gmc => gmc.SchoolClass)
+                .Include(gmc => gmc.GroupMember)
+                .ThenInclude(gm => gm.User)
+                .ToListAsync();
+        }
+
     }
 }

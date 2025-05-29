@@ -46,5 +46,13 @@ namespace MemoriesBack.Controller
             var classes = await _assignmentService.GetAssignedClassesAsync(teacherId, groupId);
             return Ok(classes.Select(c => new { c.Id, c.ClassName }));
         }
+        
+        [HttpGet("/api/groups/assignments")]
+        public async Task<IActionResult> GetAllAssignments()
+        {
+            var result = await _assignmentService.GetAllAssignmentsAsync();
+            return Ok(result);
+        }
+
     }
 }
