@@ -1,31 +1,40 @@
-﻿using System;
+﻿// Plik: GroupMemberClassService.cs
+using System;
+using System.Collections.Generic; 
+using System.Linq; 
 using System.Threading.Tasks;
 using MemoriesBack.DTO;
 using MemoriesBack.Entities;
-using MemoriesBack.Repository;
+using MemoriesBack.Repository; // Upewnij się, że ta przestrzeń nazw zawiera interfejsy
 
 namespace MemoriesBack.Service
 {
     public class GroupMemberClassService
     {
-        private readonly GroupMemberClassRepository _repository;
+        // ZMIANA: Użycie interfejsu (było już poprawne w Twoim kodzie)
+        private readonly IGroupMemberClassRepository _repository;
 
-        public GroupMemberClassService(GroupMemberClassRepository repository)
+        // ZMIANA: Typ parametru na interfejs (było już poprawne w Twoim kodzie)
+        public GroupMemberClassService(IGroupMemberClassRepository repository)
         {
             _repository = repository;
         }
 
         public async Task<ClassDTO> FindSubjectByGroupAndTeacherAsync(int groupId, int teacherId)
         {
+            // Używamy metody z interfejsu
             var gmc = await _repository.GetFirstByGroupIdAndUserIdAsync(groupId, teacherId);
             if (gmc == null)
-                throw new ArgumentException("Brak przypisania klasy/przedmiotu");
+                throw new ArgumentException("Brak przypisania nauczyciela do przedmiotu w tej grupie.");
 
-            var schoolClass = gmc.SchoolClass;
-            return new ClassDTO(schoolClass.Id, schoolClass.ClassName);
+            if (gmc.SchoolClass == null) // Zakładamy, że repozytorium (przez interfejs) załadowało SchoolClass
+                throw new InvalidOperationException("Nie udało się załadować danych przedmiotu dla znalezionego przypisania.");
+
+            return new ClassDTO(gmc.SchoolClass.Id, gmc.SchoolClass.ClassName);
         }
         public async Task<List<AssignmentDTO>> GetAssignmentsForGroup(int groupId)
         {
+            // Używamy metody z interfejsu
             var gmcList = await _repository.GetByUserGroupIdAsync(groupId);
 
             Console.WriteLine($"🔍 Dla grupy {groupId} znaleziono {gmcList.Count} przypisań");
@@ -37,16 +46,15 @@ namespace MemoriesBack.Service
 
             return gmcList
                 .Where(gmc =>
-                    gmc.GroupMember != null &&
-                    gmc.GroupMember.User != null &&
+                    gmc.GroupMember?.User != null && 
                     gmc.SchoolClass != null &&
                     gmc.GroupMember.User.UserRole == User.Role.T)
                 .Select(gmc => new AssignmentDTO(
-                    gmc.Id,
-                    $"{gmc.GroupMember.User.Name} {gmc.GroupMember.User.Surname}",
-                    gmc.SchoolClass.ClassName,
-                    gmc.SchoolClass.Id,
-                    gmc.SchoolClass.ClassName
+                    gmc.Id, 
+                    $"{gmc.GroupMember!.User!.Name} {gmc.GroupMember.User.Surname}", 
+                    gmc.SchoolClass!.ClassName,
+                    gmc.SchoolClass.Id, 
+                    gmc.SchoolClass.ClassName 
                 ))
                 .ToList();
         }

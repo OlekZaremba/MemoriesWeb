@@ -1,9 +1,10 @@
-﻿using System;
+﻿// Plik: AssignmentService.cs
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MemoriesBack.Entities;
-using MemoriesBack.Repository;
+using MemoriesBack.Repository; 
 using MemoriesBack.DTO;
 
 namespace MemoriesBack.Service
@@ -14,7 +15,7 @@ namespace MemoriesBack.Service
         private readonly UserGroupRepository _groupRepo;
         private readonly GroupMemberRepository _groupMemberRepo;
         private readonly SchoolClassRepository _classRepo;
-        private readonly GroupMemberClassRepository _gmClassRepo;
+        private readonly IGroupMemberClassRepository _gmClassRepo;
         
 
         public AssignmentService(
@@ -22,7 +23,7 @@ namespace MemoriesBack.Service
             UserGroupRepository groupRepo,
             GroupMemberRepository groupMemberRepo,
             SchoolClassRepository classRepo,
-            GroupMemberClassRepository gmClassRepo)
+            IGroupMemberClassRepository gmClassRepo)
         {
             _userRepo = userRepo;
             _groupRepo = groupRepo;
@@ -46,9 +47,7 @@ namespace MemoriesBack.Service
 
             var member = new GroupMember
             {
-                User = teacher,
                 UserId = teacherId,
-                UserGroup = group,
                 UserGroupId = groupId
             };
 
@@ -57,9 +56,8 @@ namespace MemoriesBack.Service
 
         public async Task AssignTeacherToClassAsync(int teacherId, int groupId, int classId)
         {
-            var groupMembers = await _groupMemberRepo.GetByUserGroupIdAsync(groupId);
-            var gm = groupMembers.FirstOrDefault(g => g.UserId == teacherId)
-                     ?? throw new ArgumentException("Nauczyciel nie należy do tej grupy");
+            var gm = await _groupMemberRepo.GetByUserIdAndGroupIdAsync(teacherId, groupId)
+                     ?? throw new ArgumentException($"Nauczyciel (ID: {teacherId}) nie należy do grupy (ID: {groupId}) lub nie znaleziono wpisu GroupMember.");
 
             var subject = await _classRepo.GetByIdAsync(classId)
                           ?? throw new ArgumentException("Nie znaleziono przedmiotu");
@@ -67,14 +65,12 @@ namespace MemoriesBack.Service
             var existingLinks = await _gmClassRepo.GetAllByGroupMemberIdAsync(gm.Id);
             if (existingLinks.Any(l => l.SchoolClassId == subject.Id))
             {
-                throw new InvalidOperationException("To przypisanie już istnieje.");
+                throw new InvalidOperationException("To przypisanie (nauczyciel-przedmiot w tej grupie) już istnieje.");
             }
 
             var link = new GroupMemberClass
             {
-                GroupMember = gm,
                 GroupMemberId = gm.Id,
-                SchoolClass = subject,
                 SchoolClassId = subject.Id
             };
             await _gmClassRepo.AddAsync(link);
@@ -83,34 +79,27 @@ namespace MemoriesBack.Service
 
         public async Task<List<SchoolClass>> GetAssignedClassesAsync(int teacherId, int groupId)
         {
-            var groupMembers = await _groupMemberRepo.GetByUserGroupIdAsync(groupId);
-            var gm = groupMembers.FirstOrDefault(m => m.UserId == teacherId)
-                ?? throw new ArgumentException("Brak przypisanego nauczyciela");
+            var gm = await _groupMemberRepo.GetByUserIdAndGroupIdAsync(teacherId, groupId)
+                ?? throw new ArgumentException($"Nauczyciel (ID: {teacherId}) nie jest przypisany do grupy (ID: {groupId}).");
 
             var assignments = await _gmClassRepo.GetAllByGroupMemberIdAsync(gm.Id);
-            return assignments.Select(a => a.SchoolClass).ToList();
+            return assignments.Select(a => a.SchoolClass).Where(sc => sc != null).ToList()!;
         }
         
         public async Task<List<AssignmentDTO>> GetAllAssignmentsAsync()
         {
-            var assignments = await _gmClassRepo.GetAllAssignmentsWithClassAndTeacher();
+            // Teraz ta metoda powinna być rozpoznawana przez interfejs
+            var assignments = await _gmClassRepo.GetAllAssignmentsWithClassAndTeacher(); 
 
             return assignments
-                .GroupBy(gmc => gmc.GroupMemberId)
-                .Select(g =>
-                {
-                    var first = g.First();
-                    var teacherName = $"{first.GroupMember.User.Name} {first.GroupMember.User.Surname}";
-                    var subjectName = first.SchoolClass.ClassName; // <--- ważne
-
-                    return new AssignmentDTO(
-                        assignmentId: first.Id,
-                        teacherName: teacherName,
-                        subjectName: subjectName,
-                        classId: first.SchoolClass.Id,
-                        className: subjectName
-                    );
-                })
+                .Where(gmc => gmc.GroupMember?.User != null && gmc.SchoolClass != null) 
+                .Select(gmc => new AssignmentDTO(
+                    assignmentId: gmc.Id, 
+                    teacherName: $"{gmc.GroupMember!.User!.Name} {gmc.GroupMember.User.Surname}",
+                    subjectName: gmc.SchoolClass!.ClassName,
+                    classId: gmc.SchoolClass.Id, 
+                    className: gmc.SchoolClass.ClassName 
+                ))
                 .ToList();
         }
     }

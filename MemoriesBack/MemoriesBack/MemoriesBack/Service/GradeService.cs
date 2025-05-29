@@ -1,26 +1,29 @@
-﻿using System;
+﻿// Plik: GradeService.cs
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore; // Upewnij się, że ten using jest obecny
+using Microsoft.EntityFrameworkCore;
 using MemoriesBack.DTO;
 using MemoriesBack.Entities;
-using MemoriesBack.Repository;
+using MemoriesBack.Repository; // Upewnij się, że ta przestrzeń nazw zawiera interfejsy
 
 namespace MemoriesBack.Service
 {
     public class GradeService
     {
-        private readonly GroupMemberRepository _groupMemberRepository;
-        private readonly GroupMemberClassRepository _groupMemberClassRepository;
-        private readonly GradeRepository _gradeRepository;
-        private readonly UserRepository _userRepository;
-        private readonly SchoolClassRepository _schoolClassRepository;
+        private readonly GroupMemberRepository _groupMemberRepository; 
+        // ZMIANA: Użycie interfejsu
+        private readonly IGroupMemberClassRepository _groupMemberClassRepository;
+        private readonly GradeRepository _gradeRepository; 
+        private readonly UserRepository _userRepository; 
+        private readonly SchoolClassRepository _schoolClassRepository; 
         private readonly UserGroupRepository _userGroupRepository;
 
         public GradeService(
             GroupMemberRepository groupMemberRepository,
-            GroupMemberClassRepository groupMemberClassRepository,
+            // ZMIANA: Typ parametru na interfejs
+            IGroupMemberClassRepository groupMemberClassRepository,
             GradeRepository gradeRepository,
             UserRepository userRepository,
             SchoolClassRepository schoolClassRepository,
@@ -58,46 +61,26 @@ namespace MemoriesBack.Service
             await _gradeRepository.AddAsync(grade);
         }
 
-        // --- ZMODYFIKOWANA METODA ---
         public async Task<List<SchoolClassDTO>> GetSubjectsForStudentAsync(int userId)
         {
-            // 1. Pobierz wszystkie oceny dla danego ucznia.
-            // WAŻNE: Upewnij się, że metoda GetByStudentIdAsync w Twoim GradeRepository
-            // dołącza powiązaną encję SchoolClass. Powinno to wyglądać mniej więcej tak:
-            //
-            // public async Task<IEnumerable<Grade>> GetByStudentIdAsync(int studentId)
-            // {
-            //     return await _context.Grades
-            //         .Include(g => g.SchoolClass) // To jest kluczowe!
-            //         .Where(g => g.StudentId == studentId)
-            //         .ToListAsync();
-            // }
             var studentGrades = await _gradeRepository.GetByStudentIdAsync(userId);
 
             if (studentGrades == null || !studentGrades.Any())
             {
-                // Jeśli uczeń nie ma żadnych ocen, można zwrócić pustą listę.
-                // Alternatywnie, można by pobrać przedmioty, do których jest formalnie przypisany
-                // (np. przez tabelę group_members_has_class), nawet jeśli nie ma z nich ocen.
-                // Dla uproszczenia, jeśli nie ma ocen, zakładamy, że nie ma "aktywnych" przedmiotów do wyświetlenia.
                 return new List<SchoolClassDTO>();
             }
 
-            // 2. Wyodrębnij unikalne przedmioty (SchoolClass) z listy ocen.
-            // Używamy GroupBy po SchoolClassId, a następnie bierzemy pierwszy SchoolClass z każdej grupy,
-            // aby mieć pewność, że mamy unikalne obiekty SchoolClass.
             var distinctSchoolClasses = studentGrades
-                .Where(g => g.SchoolClass != null) // Upewnij się, że SchoolClass nie jest null (powinno być załadowane przez Include)
+                .Where(g => g.SchoolClass != null) 
                 .GroupBy(g => g.SchoolClassId)
                 .Select(group => group.First().SchoolClass)
                 .ToList();
 
             var result = new List<SchoolClassDTO>();
 
-            // 3. Dla każdego unikalnego przedmiotu oblicz średnią ocen ucznia z tego przedmiotu.
             foreach (var sc in distinctSchoolClasses)
             {
-                // Filtruj oceny tylko dla bieżącego przedmiotu, aby poprawnie obliczyć średnią.
+                if (sc == null) continue; // Dodatkowe zabezpieczenie
                 var gradesForThisSubject = studentGrades
                     .Where(g => g.SchoolClassId == sc.Id)
                     .ToList();
@@ -113,7 +96,6 @@ namespace MemoriesBack.Service
 
             return result;
         }
-        // --- KONIEC ZMODYFIKOWANEJ METODY ---
 
         public async Task<List<GradeSummaryDTO>> GetGradesForSubjectAsync(int studentId, int classId)
         {
@@ -135,15 +117,16 @@ namespace MemoriesBack.Service
             var g = await _gradeRepository.GetByIdAsync(gradeId)
                 ?? throw new ArgumentException("Ocena nie istnieje");
 
+            // Upewnij się, że GetByIdAsync w GradeRepository dołącza Student, Teacher, SchoolClass
             return new GradeDetailDTO(
                 g.Id,
                 g.GradeValue,
                 g.Type ?? "",
                 g.IssueDate.ToString("yyyy-MM-dd"),
                 g.Description ?? "",
-                $"{g.Student.Name} {g.Student.Surname}",
-                $"{g.Teacher.Name} {g.Teacher.Surname}",
-                g.SchoolClass?.ClassName ?? ""
+                (g.Student != null) ? $"{g.Student.Name} {g.Student.Surname}" : "N/A", 
+                (g.Teacher != null) ? $"{g.Teacher.Name} {g.Teacher.Surname}" : "N/A", 
+                g.SchoolClass?.ClassName ?? "N/A"
             );
         }
 
@@ -159,7 +142,7 @@ namespace MemoriesBack.Service
                 g.SchoolClass?.ClassName ?? ""
             )).ToList();
 
-            foreach (var gradeEntity in grades) // Zmieniono nazwę zmiennej, aby uniknąć konfliktu
+            foreach (var gradeEntity in grades) 
             {
                 gradeEntity.Notified = true;
             }
@@ -176,6 +159,7 @@ namespace MemoriesBack.Service
             var result = new List<SchoolClassDTO>();
             foreach (var sc in classes)
             {
+                if (sc == null) continue; // Dodatkowe zabezpieczenie
                 var grades = await _gradeRepository.GetByTeacherAndClassAsync(teacherId, sc.Id);
                 double avg = grades.Any() ? grades.Average(g => g.GradeValue) : 0.0;
 
@@ -189,15 +173,15 @@ namespace MemoriesBack.Service
         {
             var members = await _groupMemberRepository.GetByUserGroupIdWithUsersAsync(groupId);
 
-            if (members == null || !members.Any()) // Poprawiono na Any()
+            if (members == null || !members.Any()) 
                 return new List<GroupStudentWithGradesDTO>();
 
             var result = new List<GroupStudentWithGradesDTO>();
 
-            // Upewnij się, że User nie jest null przed próbą dostępu do UserRole
-            foreach (var student in members.Where(m => m.User != null && m.User.UserRole == User.Role.S).Select(m => m.User))
+            foreach (var studentUser in members.Where(m => m.User != null && m.User.UserRole == User.Role.S).Select(m => m.User))
             {
-                var grades = await _gradeRepository.GetByStudentIdAsync(student.Id);
+                if (studentUser == null) continue; // Dodatkowe zabezpieczenie
+                var grades = await _gradeRepository.GetByStudentIdAsync(studentUser.Id);
 
                 var gradeDtos = grades.Select(g => new GradeSimpleDTO(
                     g.Id,
@@ -210,14 +194,13 @@ namespace MemoriesBack.Service
                 double average = 0.0;
                 if (gradeDtos.Any())
                 {
-                    // Upewnij się, że g.Value jest interpretowane jako double
                     average = Math.Round(gradeDtos.Average(g => Convert.ToDouble(g.Value)), 2);
                 }
 
                 result.Add(new GroupStudentWithGradesDTO(
-                    student.Id,
-                    student.Name,
-                    student.Surname,
+                    studentUser.Id,
+                    studentUser.Name,
+                    studentUser.Surname,
                     gradeDtos,
                     average
                 ));

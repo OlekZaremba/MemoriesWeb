@@ -1,9 +1,11 @@
-﻿using System;
+﻿// Plik: AuthService.cs
+using System;
+using System.Linq; 
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using MemoriesBack.Entities;
-using MemoriesBack.Repository;
+using MemoriesBack.Repository; // Upewnij się, że ta przestrzeń nazw zawiera interfejsy
 using MemoriesBack.DTO;
 
 namespace MemoriesBack.Service
@@ -15,7 +17,8 @@ namespace MemoriesBack.Service
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly UserGroupRepository _userGroupRepository;
         private readonly GroupMemberRepository _groupMemberRepository;
-        private readonly GroupMemberClassRepository _groupMemberClassRepository;
+        // ZMIANA: Użycie interfejsu
+        private readonly IGroupMemberClassRepository _groupMemberClassRepository;
 
         public AuthService(
             SensitiveDataRepository sensitiveDataRepository,
@@ -23,7 +26,8 @@ namespace MemoriesBack.Service
             IPasswordHasher<User> passwordHasher,
             UserGroupRepository userGroupRepository,
             GroupMemberRepository groupMemberRepository,
-            GroupMemberClassRepository groupMemberClassRepository)
+            // ZMIANA: Typ parametru na interfejs
+            IGroupMemberClassRepository groupMemberClassRepository)
         {
             _sensitiveDataRepository = sensitiveDataRepository;
             _userRepository = userRepository;
@@ -38,19 +42,38 @@ namespace MemoriesBack.Service
             var data = await _sensitiveDataRepository.GetByLoginAsync(login)
                        ?? throw new ArgumentException("Nieprawidłowy login");
 
-            var user = data.User;
+            var user = data.User ?? throw new InvalidOperationException("User data not found for sensitive data entry.");
             var result = _passwordHasher.VerifyHashedPassword(user, data.Password, password);
             if (result != PasswordVerificationResult.Success)
                 throw new ArgumentException("Nieprawidłowe hasło");
 
-            var members = await _groupMemberRepository.GetAllByUserIdAsync(user.Id);
-            var className = members != null && members.Count > 0 && members[0].UserGroup != null
-                ? members[0].UserGroup.GroupName
-                : null;
+            var members = await _groupMemberRepository.GetAllByUserIdAsync(user.Id); 
+            
+            string? className = null;
+            int? groupId = null;
+
+            if (members != null && members.Any())
+            {
+                var firstMember = members.First();
+                // Zakładamy, że UserGroup jest ładowane przez GetAllByUserIdAsync lub pobieramy je osobno
+                var userGroup = firstMember.UserGroup; 
+                if (userGroup == null && firstMember.UserGroupId != 0) 
+                {
+                    // Jeśli UserGroup nie zostało załadowane z GroupMember, spróbuj załadować je przez UserGroupRepository
+                    // To wymagałoby, aby UserGroupRepository było dostępne i miało odpowiednią metodę.
+                    // Dla uproszczenia, zakładamy, że jeśli UserGroupId jest ustawione, to grupa istnieje.
+                    // Idealnie, GetAllByUserIdAsync powinno robić .Include(gm => gm.UserGroup)
+                    var tempGroup = await _userGroupRepository.GetByIdAsync(firstMember.UserGroupId);
+                    className = tempGroup?.GroupName;
+                }
+                else
+                {
+                    className = userGroup?.GroupName;
+                }
+                groupId = firstMember.UserGroupId;
+            }
 
             string imageBase64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
-
-            int? groupId = members?.FirstOrDefault()?.UserGroupId;
 
             return new LoginResponse(
                 user.Id,
@@ -58,10 +81,9 @@ namespace MemoriesBack.Service
                 user.Surname,
                 user.UserRole,
                 imageBase64,
-                className,
-                groupId 
+                className, 
+                groupId    
             );
-
         }
 
         public async Task RegisterUser(RegisterUserRequest request)
@@ -77,28 +99,27 @@ namespace MemoriesBack.Service
                 UserRole = request.Role
             };
 
-            await _userRepository.AddAsync(user);
+            await _userRepository.AddAsync(user); // Najpierw zapisz użytkownika, aby uzyskać user.Id
 
             var sensitive = new SensitiveData
             {
                 Login = request.Login,
                 Email = request.Email, 
                 Password = _passwordHasher.HashPassword(user, request.Password),
-                User = user
+                UserId = user.Id 
             };
-
 
             await _sensitiveDataRepository.AddAsync(sensitive);
 
-            if (request.GroupId != 0)
+            if (request.GroupId != 0) 
             {
                 var group = await _userGroupRepository.GetByIdAsync(request.GroupId)
                     ?? throw new ArgumentException("Nie ma takiej grupy: " + request.GroupId);
 
                 var gm = new GroupMember
                 {
-                    User = user,
-                    UserGroup = group
+                    UserId = user.Id, 
+                    UserGroupId = group.Id 
                 };
 
                 await _groupMemberRepository.AddAsync(gm);
