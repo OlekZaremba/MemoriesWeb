@@ -56,20 +56,7 @@ namespace MemoriesBack.Service
                 }
             }
 
-            var user = gmc.GroupMember.User;
-            var schoolClass = gmc.SchoolClass;
-            var userGroup = gmc.GroupMember.UserGroup;
-
-            return new ScheduleResponseDTO(
-                first.Id,
-                gmc.Id,
-                first.LessonDate,
-                first.StartTime,
-                first.EndTime,
-                $"{user.Name} {user.Surname}",
-                schoolClass.ClassName,
-                userGroup.GroupName
-            );
+            return MapToDto(first);
         }
 
         public async Task<List<ScheduleResponseDTO>> GetScheduleForGroupAsync(int groupId, DateTime from, DateTime to)
@@ -80,6 +67,30 @@ namespace MemoriesBack.Service
         public async Task<List<ScheduleResponseDTO>> GetScheduleForTeacherAsync(int teacherId, DateTime from, DateTime to)
         {
             return await _scheduleRepository.GetByTeacherAndDateRangeAsync(teacherId, from, to);
+        }
+
+        public async Task<List<ScheduleResponseDTO>> GetScheduleInDateRangeAsync(DateTime from, DateTime to)
+        {
+            var schedules = await _scheduleRepository.GetWithDetailsInRangeAsync(from, to);
+            return schedules.Select(MapToDto).ToList();
+        }
+
+        private ScheduleResponseDTO MapToDto(Schedule s)
+        {
+            var user = s.GroupMemberClass.GroupMember.User;
+            var schoolClass = s.GroupMemberClass.SchoolClass;
+            var userGroup = s.GroupMemberClass.GroupMember.UserGroup;
+
+            return new ScheduleResponseDTO(
+                s.Id,
+                s.GroupMemberClass.Id,
+                s.LessonDate,
+                s.StartTime,
+                s.EndTime,
+                $"{user.Name} {user.Surname}",
+                schoolClass.ClassName,
+                userGroup.GroupName
+            );
         }
     }
 }

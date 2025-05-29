@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MemoriesBack.DTO;
-using MemoriesBack.Service;
 using MemoriesBack.DTOs;
+using MemoriesBack.Service;
 
 namespace MemoriesBack.Controller
 {
@@ -43,6 +43,16 @@ namespace MemoriesBack.Controller
             [FromQuery] DateTime to)
         {
             var result = await _scheduleService.GetScheduleForTeacherAsync(teacherId, from, to);
+            return Ok(result);
+        }
+
+
+        [HttpGet]
+        public async Task<ActionResult<List<ScheduleResponseDTO>>> GetScheduleInDateRange(
+            [FromQuery] DateTime from,
+            [FromQuery] DateTime to)
+        {
+            var result = await _scheduleService.GetScheduleInDateRangeAsync(from, to);
             return Ok(result);
         }
     }

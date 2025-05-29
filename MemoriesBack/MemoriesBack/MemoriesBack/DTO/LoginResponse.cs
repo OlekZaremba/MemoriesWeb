@@ -8,6 +8,7 @@ namespace MemoriesBack.DTO
         string Surname,
         User.Role Role,
         string Image,
-        string ClassName
+        string ClassName,
+        int? GroupId 
     );
 }

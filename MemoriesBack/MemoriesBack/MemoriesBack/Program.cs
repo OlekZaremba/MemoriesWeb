@@ -57,6 +57,7 @@ namespace MemoriesBack
             builder.Services.AddScoped<UserGroupService>();
             builder.Services.AddScoped<GroupMemberClassService>();
             builder.Services.AddScoped<GradeService>();
+            builder.Services.AddScoped<ScheduleService>();
 
 
             builder.Services.Configure<FormOptions>(options =>

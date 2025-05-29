@@ -50,14 +50,18 @@ namespace MemoriesBack.Service
 
             string imageBase64 = string.IsNullOrWhiteSpace(user.Image) ? "" : user.Image;
 
+            int? groupId = members?.FirstOrDefault()?.UserGroupId;
+
             return new LoginResponse(
                 user.Id,
                 user.Name,
                 user.Surname,
                 user.UserRole,
                 imageBase64,
-                className
+                className,
+                groupId 
             );
+
         }
 
         public async Task RegisterUser(RegisterUserRequest request)
@@ -78,7 +82,7 @@ namespace MemoriesBack.Service
             var sensitive = new SensitiveData
             {
                 Login = request.Login,
-                Email = request.Email, // ← DODAJ TO
+                Email = request.Email, 
                 Password = _passwordHasher.HashPassword(user, request.Password),
                 User = user
             };

@@ -81,5 +81,20 @@ namespace MemoriesBack.Repository
                 ))
                 .ToListAsync();
         }
+        
+        public async Task<List<Schedule>> GetWithDetailsInRangeAsync(DateTime from, DateTime to)
+        {
+            return await _context.Schedules
+                .Include(s => s.GroupMemberClass)
+                .ThenInclude(gmc => gmc.GroupMember)
+                .ThenInclude(gm => gm.User)
+                .Include(s => s.GroupMemberClass)
+                .ThenInclude(gmc => gmc.SchoolClass)
+                .Include(s => s.GroupMemberClass)
+                .ThenInclude(gmc => gmc.GroupMember.UserGroup)
+                .Where(s => s.LessonDate >= from && s.LessonDate <= to)
+                .ToListAsync();
+        }
+
     }
 }
