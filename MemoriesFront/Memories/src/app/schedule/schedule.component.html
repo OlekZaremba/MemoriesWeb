@@ -29,14 +29,16 @@
     <h2>Edycja planu zajęć</h2>
 
     <label>Wybierz klasę:</label>
-    <select [(ngModel)]="editLesson.classId">
+    <select [(ngModel)]="editLesson.classId" (change)="onClassChange()">
+      <option [value]="null" disabled selected>-- wybierz klasę --</option>
       <option *ngFor="let cls of availableClasses" [value]="cls.id">{{ cls.groupName }}</option>
     </select>
 
     <label>Wybierz nauczyciela z przedmiotem:</label>
-    <select [(ngModel)]="editLesson.assignmentId">
+    <select [(ngModel)]="editLesson.assignmentId" [disabled]="availableAssignments.length === 0">
+      <option [value]="null" disabled selected>-- wybierz nauczyciela --</option>
       <option *ngFor="let t of availableAssignments" [value]="t.assignmentId">
-      {{ t.teacherName }} - {{ t.subjectName }}
+        {{ t.teacherName }} - {{ t.subjectName }}
       </option>
     </select>
 

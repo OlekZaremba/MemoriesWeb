@@ -98,5 +98,13 @@ namespace MemoriesBack.Controller
             var result = await _groupMemberClassService.FindSubjectByGroupAndTeacherAsync(groupId, teacherId);
             return Ok(result);
         }
+
+		[HttpGet("group/{groupId}/assignments")]
+		public async Task<ActionResult<List<AssignmentDTO>>> GetAssignmentsForGroup(int groupId)
+		{
+    		var assignments = await _groupMemberClassService.GetAssignmentsForGroup(groupId);
+    		return Ok(assignments);
+		}
+
     }
 }

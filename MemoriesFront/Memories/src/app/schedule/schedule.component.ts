@@ -81,19 +81,38 @@ export class ScheduleComponent implements OnInit {
       });
   }
 
-
   getLessonsForSelectedDate(): Lesson[] {
     return this.lessons;
   }
 
   openEditModal() {
     this.loadAvailableClasses();
-    this.loadAvailableAssignments();
+    this.availableAssignments = []; // reset assignments
+    this.editLesson = {
+      classId: null,
+      assignmentId: null,
+      date: this.formatDate(new Date()),
+      startTime: '',
+      endTime: ''
+    };
     this.showEditModal = true;
   }
 
   closeEditModal() {
     this.showEditModal = false;
+  }
+
+  onClassChange() {
+    if (this.editLesson.classId != null) {
+      this.http.get<Assignment[]>(`${BASE_URL}/api/groups/group/${this.editLesson.classId}/assignments`)
+        .subscribe(data => {
+          console.log("📦 Otrzymane assignmenty:", data);
+          this.availableAssignments = data;
+        });
+    } else {
+      this.availableAssignments = [];
+    }
+    this.editLesson.assignmentId = null;
   }
 
   saveLesson() {
@@ -123,13 +142,6 @@ export class ScheduleComponent implements OnInit {
     this.http.get<ClassGroup[]>(`${BASE_URL}/api/groups`)
       .subscribe(data => {
         this.availableClasses = data;
-      });
-  }
-
-  loadAvailableAssignments() {
-    this.http.get<Assignment[]>(`${BASE_URL}/api/groups/assignments`)
-      .subscribe(data => {
-        this.availableAssignments = data;
       });
   }
 }

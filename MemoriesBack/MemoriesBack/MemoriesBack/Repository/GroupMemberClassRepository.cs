@@ -59,7 +59,8 @@ namespace MemoriesBack.Repository
         {
             return await _context.GroupMemberClasses
                 .Include(gmc => gmc.SchoolClass)
-                .Include(gmc => gmc.GroupMember) 
+                .Include(gmc => gmc.GroupMember)
+                .ThenInclude(gm => gm.User)
                 .Where(gmc => gmc.GroupMember.UserGroupId == userGroupId)
                 .ToListAsync();
         }
