@@ -199,5 +199,45 @@ namespace MemoriesBack.Controller
 
             return Ok(uniqueTeachers);
         }
+        
+        public class AssignGroupsRequest
+        {
+            public List<int> GroupIds { get; set; } = new();
+        }
+
+        [HttpGet("{userId}/available-groups")]
+        public async Task<ActionResult<List<GroupDTO>>> GetAvailableGroups(int userId)
+        {
+            var allGroups = await _userGroupRepo.GetAllAsync();
+            var assignedGroups = await _groupMemberRepo.GetAllByUserIdAsync(userId);
+            var assignedGroupIds = assignedGroups.Select(gm => gm.UserGroupId).ToHashSet();
+
+            var availableGroups = allGroups
+                .Where(g => !assignedGroupIds.Contains(g.Id))
+                .Select(g => new GroupDTO(g.Id, g.GroupName))
+                .ToList();
+
+            return Ok(availableGroups);
+        }
+
+        [HttpPost("{userId}/assign-groups")]
+        public async Task<IActionResult> AssignGroupsToUser(int userId, [FromBody] AssignGroupsRequest request)
+        {
+            foreach (var groupId in request.GroupIds)
+            {
+                var exists = await _groupMemberRepo.GetByUserIdAndGroupIdAsync(userId, groupId);
+                if (exists != null) continue;
+
+                var gm = new GroupMember
+                {
+                    UserId = userId,
+                    UserGroupId = groupId
+                };
+                await _groupMemberRepo.AddAsync(gm);
+            }
+
+            return Ok();
+        }
+
     }
 }

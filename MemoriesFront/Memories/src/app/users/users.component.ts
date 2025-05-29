@@ -32,16 +32,15 @@ export class UsersComponent implements OnInit {
     firstName: '',
     lastName: '',
     email: '',
-    role: '',
+    role: 'Uczeń',
     groupId: null as number | null,
     login: ''
   };
 
-
   showAssignModal = false;
   selectedUserName = '';
-  availableClasses = ['Klasa 1', 'Klasa 2', 'Klasa 3'];
   selectedClasses: string[] = [];
+  editedUserId: number | null = null;
 
   availableGroups: { id: number, groupName: string }[] = [];
 
@@ -53,7 +52,6 @@ export class UsersComponent implements OnInit {
   allUsers: any[] = [];
 
   searchTerm: string = '';
-  editedUserId: number | null = null;
 
   private http = inject(HttpClient);
 
@@ -73,30 +71,22 @@ export class UsersComponent implements OnInit {
 
   loadTeachersForStudent() {
     this.http.get<any[]>(`${BASE_URL}/api/users/student/${this.userId}/teachers`)
-      .subscribe(data => {
-        this.teachersForStudent = data;
-      });
+      .subscribe(data => this.teachersForStudent = data);
   }
 
   loadGroupsForTeacher() {
     this.http.get<any[]>(`${BASE_URL}/api/users/${this.userId}/groups`)
-      .subscribe(data => {
-        this.teacherGroups = data;
-      });
+      .subscribe(data => this.teacherGroups = data);
   }
 
   loadAllUsers() {
     this.http.get<any[]>(`${BASE_URL}/api/users`)
-      .subscribe(data => {
-        this.allUsers = data;
-      });
+      .subscribe(data => this.allUsers = data);
   }
 
   loadAvailableGroups() {
     this.http.get<{ id: number, groupName: string }[]>(`${BASE_URL}/api/groups`)
-      .subscribe(data => {
-        this.availableGroups = data;
-      });
+      .subscribe(data => this.availableGroups = data);
   }
 
   goToGroupUsersView(groupId: number) {
@@ -112,22 +102,6 @@ export class UsersComponent implements OnInit {
     this.showResetModal = false;
   }
 
-  loadUserDetails(userId: number) {
-    this.http.get<any>(`${BASE_URL}/api/users/${userId}`).subscribe(user => {
-      this.editUser = {
-        firstName: user.name,
-        lastName: user.surname,
-        email: user.login, // login = e-mail
-        role: this.mapRole(user.role),
-        groups: '',
-      };
-      this.editedUserId = user.id;
-      this.showEditModal = true;
-    });
-  }
-
-
-
   resetPassword() {
     if (!this.selectedEmail) {
       alert("Brak adresu e-mail.");
@@ -136,41 +110,70 @@ export class UsersComponent implements OnInit {
 
     this.http.post(`${BASE_URL}/api/auth/request-password-reset`, {
       login: this.selectedEmail
-    }, { responseType: 'text' }) // oczekujemy tekstu, nie JSON-a
-      .subscribe({
-        next: (msg) => {
-          alert("Link resetujący został wysłany.");
-          this.closeResetModal();
-        },
-        error: (err) => {
-          console.error("❌ Błąd resetowania hasła:", err);
-          alert("Nie udało się zresetować hasła.");
-        }
-      });
+    }, { responseType: 'text' }).subscribe({
+      next: () => {
+        alert("Link resetujący został wysłany.");
+        this.closeResetModal();
+      },
+      error: (err) => {
+        console.error("❌ Błąd resetowania hasła:", err);
+        alert("Nie udało się zresetować hasła.");
+      }
+    });
   }
 
-
-  openAssignModal(userName: string) {
-    this.selectedUserName = userName;
+  openAssignModal(user: any) {
+    this.selectedUserName = `${user.name} ${user.surname}`;
     this.selectedClasses = [];
     this.showAssignModal = true;
+    this.editedUserId = user.id;
+
+    this.http.get<{ id: number, groupName: string }[]>(`${BASE_URL}/api/users/${user.id}/available-groups`)
+      .subscribe(data => this.availableGroups = data);
   }
 
   closeAssignModal() {
     this.showAssignModal = false;
   }
 
-  toggleGroup(group: string, checked: boolean) {
+  toggleGroup(groupId: number, checked: boolean) {
     if (checked) {
-      this.selectedClasses.push(group);
+      this.selectedClasses.push(groupId.toString());
     } else {
-      this.selectedClasses = this.selectedClasses.filter(g => g !== group);
+      this.selectedClasses = this.selectedClasses.filter(id => id !== groupId.toString());
     }
   }
 
   assignToGroups() {
-    console.log(`✅ Przypisuję ${this.selectedUserName} do klas:`, this.selectedClasses);
-    this.closeAssignModal();
+    if (!this.editedUserId || this.selectedClasses.length === 0) return;
+
+    const groupIds = this.selectedClasses.map(id => parseInt(id));
+
+    this.http.post(`${BASE_URL}/api/users/${this.editedUserId}/assign-groups`, { groupIds })
+      .subscribe({
+        next: () => {
+          alert('✅ Przypisano użytkownika do grup.');
+          this.loadAllUsers();
+          this.closeAssignModal();
+        },
+        error: () => {
+          alert('❌ Błąd przypisywania użytkownika do grup.');
+        }
+      });
+  }
+
+  loadUserDetails(userId: number) {
+    this.http.get<any>(`${BASE_URL}/api/users/${userId}`).subscribe(user => {
+      this.editUser = {
+        firstName: user.name,
+        lastName: user.surname,
+        email: user.login,
+        role: this.mapRole(user.role),
+        groups: ''
+      };
+      this.editedUserId = user.id;
+      this.showEditModal = true;
+    });
   }
 
   openEditModal(user: any) {
@@ -181,7 +184,6 @@ export class UsersComponent implements OnInit {
   prepareUserForEdit(user: any) {
     this.loadUserDetails(user.id);
   }
-
 
   closeEditModal() {
     this.showEditModal = false;
@@ -211,7 +213,7 @@ export class UsersComponent implements OnInit {
       next: () => {
         alert("✅ Dane użytkownika zostały zaktualizowane.");
         this.closeEditModal();
-        this.loadAllUsers(); // odśwież listę
+        this.loadAllUsers();
       },
       error: (err) => {
         console.error("❌ Błąd aktualizacji użytkownika:", err);
@@ -219,7 +221,6 @@ export class UsersComponent implements OnInit {
       }
     });
   }
-
 
   openCreateModal() {
     this.newUser = {
@@ -233,9 +234,16 @@ export class UsersComponent implements OnInit {
     this.showCreateModal = true;
   }
 
-
   closeCreateModal() {
     this.showCreateModal = false;
+  }
+
+  onCheckboxChange(event: Event, groupId: number) {
+    const input = event.target as HTMLInputElement | null;
+
+    if (input) {
+      this.toggleGroup(groupId, input.checked);
+    }
   }
 
   createUser() {
@@ -256,7 +264,6 @@ export class UsersComponent implements OnInit {
       role: roleMap[this.newUser.role],
       groupId: this.newUser.groupId
     };
-
 
     this.http.post(`${BASE_URL}/api/auth/register`, payload).subscribe({
       next: () => {

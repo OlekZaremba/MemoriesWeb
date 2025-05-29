@@ -73,7 +73,7 @@
                   <button class="goToGrade" (click)="openResetModal(user.email)">Resetuj</button>
                 </td>
                 <td>
-                  <button class="goToGrade" (click)="openAssignModal(user.name + ' ' + user.surname)">Przypisz</button>
+                  <button class="goToGrade" (click)="openAssignModal(user)">Przypisz</button>
                 </td>
                 <td>
                   <button class="goToGrade" (click)="prepareUserForEdit(user)">Edytuj</button>
@@ -88,16 +88,12 @@
   </div>
 </div>
 
-
-
 <!-- Reset password modal -->
 <div class="modal-backdrop" *ngIf="showResetModal">
   <div class="modal">
     <h2>Resetowanie hasła</h2>
-
     <label>E-mail użytkownika:</label>
     <input type="text" [value]="selectedEmail" disabled />
-
     <div class="modal-buttons">
       <button (click)="resetPassword()">Zresetuj hasło</button>
       <button (click)="closeResetModal()">Anuluj</button>
@@ -109,27 +105,24 @@
 <div class="modal-backdrop" *ngIf="showAssignModal">
   <div class="modal">
     <h2>Przypisz do grup</h2>
-
     <label>Użytkownik:</label>
     <input type="text" [value]="selectedUserName" disabled />
 
     <label>Wybierz grupy:</label>
-    <label *ngFor="let cls of availableClasses" class="checkbox-row">
+    <label *ngFor="let group of availableGroups" class="checkbox-row">
       <input
         type="checkbox"
-        [checked]="selectedClasses.includes(cls)"
-        #cb
-        (change)="toggleGroup(cls, cb.checked)"
-      />
-      {{ cls }}
+        [checked]="selectedClasses.includes(group.id.toString())"
+        (change)="onCheckboxChange($event, group.id)"/>
+      {{ group.groupName }}
     </label>
+
     <div class="modal-buttons">
       <button (click)="assignToGroups()">Zapisz</button>
       <button (click)="closeAssignModal()">Anuluj</button>
     </div>
   </div>
 </div>
-
 
 <!-- Edit user modal -->
 <div class="modal-backdrop" *ngIf="showEditModal">
@@ -147,7 +140,6 @@
 
     <label>Rola:</label>
     <input type="text" [(ngModel)]="editUser.role" disabled />
-
 
     <div class="modal-buttons">
       <button (click)="saveUserEdits()">Zapisz</button>
@@ -191,4 +183,3 @@
     </div>
   </div>
 </div>
-
