@@ -61,29 +61,21 @@
   </div>
 </div>
 
-<!-- Modal: Przypisz przedmiot do nauczyciela w klasie -->
+<!-- Modal: Przypisz przedmiot do relacji nauczyciel-klasa -->
 <div class="modal-backdrop" *ngIf="showAssignTeacherModal">
   <div class="modal">
     <h2>Przypisz przedmiot nauczycielowi w klasie</h2>
 
-    <label>Nauczyciel:</label>
-    <select [(ngModel)]="selectedTeacherId">
-      <option [ngValue]="null" disabled>-- Wybierz nauczyciela --</option>
-      <option *ngFor="let teacher of teachers" [ngValue]="teacher.id">
-        {{ teacher.name }} {{ teacher.surname }}
-      </option>
-    </select>
-
-    <label>Klasa:</label>
-    <select [(ngModel)]="selectedGroupId">
-      <option [ngValue]="null" disabled>-- Wybierz klasę --</option>
-      <option *ngFor="let group of groups" [ngValue]="group.id">
-        {{ group.groupName }}
+    <label>Relacja (nauczyciel – klasa):</label>
+    <select [(ngModel)]="selectedGroupMemberId">
+      <option [ngValue]="null" disabled>-- Wybierz relację --</option>
+      <option *ngFor="let gm of groupMembers" [ngValue]="gm.id">
+        {{ gm.teacherName }} – {{ gm.groupName }}
       </option>
     </select>
 
     <div class="modal-buttons">
-      <button (click)="assignTeacherToGroupAndSubject()">Zapisz</button>
+      <button (click)="assignSubjectToGroupMember()">Zapisz</button>
       <button (click)="closeAssignTeacherModal()">Anuluj</button>
     </div>
   </div>

@@ -62,6 +62,15 @@ namespace MemoriesBack.Repository
             return await _context.GroupMembers
                 .FirstOrDefaultAsync(gm => gm.UserId == userId && gm.UserGroupId == groupId);
         }
+        
+        public async Task<List<GroupMember>> GetTeachersWithGroupsAsync()
+        {
+            return await _context.GroupMembers
+                .Include(gm => gm.User)
+                .Include(gm => gm.UserGroup)
+                .Where(gm => gm.User.UserRole == User.Role.T)
+                .ToListAsync();
+        }
 
     }
 }

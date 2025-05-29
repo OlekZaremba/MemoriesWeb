@@ -1,5 +1,6 @@
 ﻿using MemoriesBack.Data;
 using MemoriesBack.Entities;
+using MemoriesBack.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,12 @@ namespace MemoriesBack.Controllers;
 public class GroupMemberController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly GroupMemberRepository _groupMemberRepo;
 
-    public GroupMemberController(AppDbContext context)
+    public GroupMemberController(AppDbContext context, GroupMemberRepository groupMemberRepo)
     {
         _context = context;
+        _groupMemberRepo = groupMemberRepo;
     }
 
     [HttpGet("teacher/{teacherId}/group/{groupId}")]
@@ -29,7 +32,7 @@ public class GroupMemberController : ControllerBase
 
         return Ok(member);
     }
-    
+
     [HttpPost("{groupMemberId}/class/{classId}")]
     public async Task<IActionResult> AssignSubjectToGroupMember(int groupMemberId, int classId)
     {
@@ -51,4 +54,20 @@ public class GroupMemberController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("teachers-with-groups")]
+    public async Task<IActionResult> GetTeachersWithGroups()
+    {
+        var data = await _groupMemberRepo.GetTeachersWithGroupsAsync();
+
+        var result = data.Select(gm => new
+        {
+            groupMemberId = gm.Id,
+            teacherId = gm.User.Id,
+            teacherName = $"{gm.User.Name} {gm.User.Surname}",
+            groupId = gm.UserGroup.Id,
+            groupName = gm.UserGroup.GroupName
+        });
+
+        return Ok(result);
+    }
 }

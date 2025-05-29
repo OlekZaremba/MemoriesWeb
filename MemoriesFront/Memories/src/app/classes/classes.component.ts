@@ -10,21 +10,16 @@ interface SubjectDTO {
   teachers?: ClassTeacherDTO[];
 }
 
-interface GroupDTO {
-  id: number;
-  groupName: string;
-}
-
-interface TeacherDTO {
-  id: number;
-  name: string;
-  surname: string;
-}
-
 interface ClassTeacherDTO {
   teacherId: number;
   teacherName: string;
   groupId: number;
+  groupName: string;
+}
+
+interface GroupMemberDTO {
+  id: number;
+  teacherName: string;
   groupName: string;
 }
 
@@ -43,17 +38,14 @@ export class ClassesComponent implements OnInit {
   newSubjectName: string = '';
 
   subjects: SubjectDTO[] = [];
-  groups: GroupDTO[] = [];
-  teachers: TeacherDTO[] = [];
+  groupMembers: GroupMemberDTO[] = [];
 
-  selectedGroupId: number | null = null;
   selectedSubjectId: number | null = null;
-  selectedTeacherId: number | null = null;
+  selectedGroupMemberId: number | null = null;
 
   ngOnInit(): void {
     this.loadSubjects();
-    this.loadGroups();
-    this.loadTeachers();
+    this.loadGroupMembers();
   }
 
   loadSubjects() {
@@ -72,17 +64,10 @@ export class ClassesComponent implements OnInit {
     });
   }
 
-  loadGroups() {
-    this.http.get<GroupDTO[]>(`${environment.apiUrl}/groups`).subscribe({
-      next: res => this.groups = res,
-      error: err => console.error('Błąd ładowania grup:', err)
-    });
-  }
-
-  loadTeachers() {
-    this.http.get<TeacherDTO[]>(`${environment.apiUrl}/users/teachers`).subscribe({
-      next: res => this.teachers = res,
-      error: err => console.error('Błąd ładowania nauczycieli:', err)
+  loadGroupMembers() {
+    this.http.get<GroupMemberDTO[]>(`${environment.apiUrl}/group-members/teachers-with-groups`).subscribe({
+      next: res => this.groupMembers = res,
+      error: err => console.error('Błąd ładowania relacji nauczyciel-klasa:', err)
     });
   }
 
@@ -109,8 +94,7 @@ export class ClassesComponent implements OnInit {
 
   openAssignTeacherModal(subjectId: number) {
     this.selectedSubjectId = subjectId;
-    this.selectedTeacherId = null;
-    this.selectedGroupId = null;
+    this.selectedGroupMemberId = null;
     this.showAssignTeacherModal = true;
   }
 
@@ -118,69 +102,24 @@ export class ClassesComponent implements OnInit {
     this.showAssignTeacherModal = false;
   }
 
-  assignTeacherToGroupAndSubject() {
-    if (!this.selectedTeacherId || !this.selectedGroupId || !this.selectedSubjectId) return;
+  assignSubjectToGroupMember() {
+    console.log('Zapisz kliknięty');
+    console.log('selectedGroupMemberId:', this.selectedGroupMemberId);
+    console.log('selectedSubjectId:', this.selectedSubjectId);
 
-    this.http.post(`${environment.apiUrl}/assignments/teacher/${this.selectedTeacherId}/group/${this.selectedGroupId}`, {})
+    if (!this.selectedGroupMemberId || !this.selectedSubjectId) {
+      console.warn('Nie wybrano wszystkich wymaganych pól.');
+      return;
+    }
+
+    this.http.post(`${environment.apiUrl}/group-members/${this.selectedGroupMemberId}/class/${this.selectedSubjectId}`, {})
       .subscribe({
         next: () => {
-          this.getGroupMemberId(this.selectedTeacherId!, this.selectedGroupId!).then(groupMemberId => {
-            console.log('Resolved groupMemberId:', groupMemberId);
-            if (!groupMemberId) {
-              console.error('Nie znaleziono przypisanego nauczyciela do klasy.');
-              return;
-            }
-
-            this.http.post(`${environment.apiUrl}/group-members/${groupMemberId}/class/${this.selectedSubjectId}`, {})
-              .subscribe({
-                next: () => {
-                  console.log('Pełna relacja nauczyciel-klasa-przedmiot zapisana.');
-                  this.closeAssignTeacherModal();
-                  this.loadSubjects();
-                },
-                error: err => {
-                  console.error('Błąd przypisania przedmiotu:', err);
-                }
-              });
-          });
+          console.log('Przypisano przedmiot do nauczyciela w klasie.');
+          this.closeAssignTeacherModal();
+          this.loadSubjects();
         },
-        error: err => {
-          if (err.status === 400) {
-            console.warn('Nauczyciel już przypisany do klasy – kontynuuję...');
-            this.getGroupMemberId(this.selectedTeacherId!, this.selectedGroupId!).then(groupMemberId => {
-              console.log('Resolved groupMemberId (fallback):', groupMemberId);
-              if (!groupMemberId) return;
-
-              this.http.post(`${environment.apiUrl}/group-members/${groupMemberId}/class/${this.selectedSubjectId}`, {})
-                .subscribe({
-                  next: () => {
-                    console.log('Przypisano przedmiot mimo wcześniejszej relacji.');
-                    this.closeAssignTeacherModal();
-                    this.loadSubjects();
-                  },
-                  error: err => {
-                    console.error('Błąd przypisania przedmiotu:', err);
-                  }
-                });
-            });
-          } else {
-            console.error('Błąd przypisywania nauczyciela do klasy:', err);
-          }
-        }
+        error: err => console.error('Błąd przypisania przedmiotu:', err)
       });
-  }
-
-  private getGroupMemberId(teacherId: number, groupId: number): Promise<number | null> {
-    return new Promise((resolve) => {
-      this.http.get<{ id: number } | null>(
-        `${environment.apiUrl}/group-members/teacher/${teacherId}/group/${groupId}`
-      ).subscribe({
-        next: res => resolve(res?.id ?? null),
-        error: err => {
-          console.error('Błąd pobierania groupMemberId:', err);
-          resolve(null);
-        }
-      });
-    });
   }
 }
