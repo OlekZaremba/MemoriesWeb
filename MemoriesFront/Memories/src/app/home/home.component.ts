@@ -1,39 +1,97 @@
-import {Component, EventEmitter, Output} from '@angular/core';
-import {NgForOf} from '@angular/common';
+import { Component, EventEmitter, inject, OnInit, Output, PLATFORM_ID } from '@angular/core'; // Dodaj PLATFORM_ID
+import { CommonModule, isPlatformBrowser } from '@angular/common'; // Dodaj CommonModule i isPlatformBrowser
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+// Stała BASE_URL, taka sama jak w ScheduleComponent
+const BASE_URL = 'http://localhost:5017';
+
+// Interfejs dla lekcji pobieranych z API (zgodny z ScheduleResponseDTO)
+interface LessonFromAPI {
+  id: number;
+  assignmentId: number;
+  lessonDate: string;
+  startTime: string;
+  endTime: string;
+  teacherName: string;
+  subjectName: string;
+  groupName: string;
+}
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NgForOf],
+  imports: [
+    CommonModule, // Zamiast indywidualnych NgForOf, NgIf. Dostarcza obie dyrektywy.
+    HttpClientModule
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   @Output() navigateTo = new EventEmitter<string>();
 
-  todayLessons = [
-    { subject: 'Matematyka', teacher: 'Jan Kowalski', startTime: '08:00', endTime: '08:45' },
-    { subject: 'Fizyka', teacher: 'Anna Nowak', startTime: '09:00', endTime: '09:45' },
-    { subject: 'Informatyka', teacher: 'Tomasz Zięba', startTime: '10:00', endTime: '10:45' },
-  ];
+  todayLessons: LessonFromAPI[] = [];
+  isLoading: boolean = true; // Dodajemy flagę ładowania
+  errorMessage: string | null = null; // Dodajemy miejsce na komunikat błędu
 
-  getTodaysLessons() {
+  private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID); // Wstrzykujemy PLATFORM_ID
+
+  ngOnInit(): void {
+    this.loadTodaysLessonsForStudent();
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+  loadTodaysLessonsForStudent(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    if (isPlatformBrowser(this.platformId)) { // Uruchamiaj tylko w przeglądarce
+      const groupId = sessionStorage.getItem('groupId');
+
+      if (groupId) {
+        const todayDate = this.formatDate(new Date());
+        this.http.get<LessonFromAPI[]>(`${BASE_URL}/api/schedules/group/${groupId}?from=${todayDate}&to=${todayDate}`)
+          .subscribe({
+            next: (lessons) => {
+              this.todayLessons = lessons;
+              this.isLoading = false;
+            },
+            error: (err) => {
+              console.error('Błąd podczas ładowania planu lekcji na dziś:', err);
+              this.errorMessage = 'Nie udało się załadować planu lekcji. Spróbuj ponownie później.';
+              this.isLoading = false;
+              this.todayLessons = [];
+            }
+          });
+      } else {
+        console.warn('Nie znaleziono groupId w sessionStorage. Nie można załadować planu lekcji.');
+        this.errorMessage = 'Informacje o grupie nie są dostępne. Nie można załadować planu.';
+        this.isLoading = false;
+        this.todayLessons = [];
+      }
+    } else {
+      // Logika dla SSR (np. nie rób nic lub załaduj domyślne dane)
+      console.log('SSR: Pomijanie ładowania lekcji z sessionStorage.');
+      this.isLoading = false;
+      // Możesz ustawić odpowiedni komunikat dla SSR, jeśli jest taka potrzeba
+      // this.errorMessage = 'Plan lekcji będzie dostępny po załadowaniu strony w przeglądarce.';
+    }
+  }
+
+  getTodaysLessons(): LessonFromAPI[] {
     return this.todayLessons;
   }
 
-  goToGrades() {
-    this.navigateTo.emit('oceny');
-  }
-
-  goToUsers() {
-    this.navigateTo.emit('uzytkownicy');
-  }
-
-  goToSummary() {
-    this.navigateTo.emit('wykresy');
-  }
-
-  goToSchedule() {
-    this.navigateTo.emit('plan');
-  }
+  // ... reszta metod goTo... bez zmian
+  goToGrades(): void { this.navigateTo.emit('oceny'); }
+  goToUsers(): void { this.navigateTo.emit('uzytkownicy'); }
+  goToSummary(): void { this.navigateTo.emit('wykresy'); }
+  goToSchedule(): void { this.navigateTo.emit('plan'); }
 }

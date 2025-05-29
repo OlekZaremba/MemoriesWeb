@@ -4,7 +4,7 @@
       <div class="small-tile grade-tile">
         <h2>Oceny</h2>
         <div class="button-n-pic">
-          <img src="/grades-pic.png">
+          <img src="/grades-pic.png" alt="Grades Icon">
           <button (click)="goToGrades()">&#10217;</button>
         </div>
       </div>
@@ -13,7 +13,7 @@
       <div class="small-tile teachers-tile">
         <h2>Użytkownicy</h2>
         <div class="button-n-pic">
-          <img src="/teachers-pic.png" style="transform: scaleX(-1); margin-left: 2rem">
+          <img src="/teachers-pic.png" style="transform: scaleX(-1); margin-left: 2rem" alt="Users Icon">
           <button (click)="goToUsers()">&#10217;</button>
         </div>
       </div>
@@ -22,7 +22,7 @@
       <div class="small-tile classes-tile">
         <h2>Podsumowanie</h2>
         <div class="button-n-pic">
-          <img src="/classes-pic.png">
+          <img src="/classes-pic.png" alt="Summary Icon">
           <button (click)="goToSummary()">&#10217;</button>
         </div>
       </div>
@@ -37,20 +37,20 @@
         <div class="schedule-list">
           <div class="lesson-item" *ngFor="let lesson of getTodaysLessons()">
             <div class="lesson-header">
-              <span class="subject">{{ lesson.subject }}</span>
+              <span class="subject">{{ lesson.subjectName }}</span>
               <span class="time">{{ lesson.startTime }} – {{ lesson.endTime }}</span>
             </div>
-            <div class="teacher">Prowadzący: {{ lesson.teacher }}</div>
+            <div class="teacher">Prowadzący: {{ lesson.teacherName }}</div>
+          </div>
+          <div *ngIf="getTodaysLessons().length === 0" class="no-lessons">
+            Brak zaplanowanych lekcji na dziś.
           </div>
         </div>
 
         <div class="other-days">
-          <div class="other-days">
-            <button (click)="goToSchedule()">Zobacz inne dni</button>
-          </div>
+          <button (click)="goToSchedule()">Zobacz inne dni</button>
         </div>
       </div>
     </div>
   </div>
 </div>
-

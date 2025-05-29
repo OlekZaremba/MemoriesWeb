@@ -1,6 +1,6 @@
 <div class="grades">
   <div class="tile">
-    <h2>Wybierz grupę</h2>
+    <h2>Wybierz grupę, aby dodać ocenę</h2>
     <div class="student-grades-table">
       <table class="subjects-table">
         <thead>
@@ -16,38 +16,52 @@
             <button class="addGrade" (click)="openModal(group.id)">Dodaj ocenę</button>
           </td>
         </tr>
+        <tr *ngIf="groups.length === 0">
+          <td colspan="2" style="text-align: center;">Nie jesteś przypisany do żadnej grupy.</td>
+        </tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-backdrop" *ngIf="showModal">
   <div class="modal">
-    <h2>Nazwa twojego przedmiotu</h2>
+    <h2 *ngIf="!isLoadingSubject && currentSubjectForGrading">
+      Dodawanie oceny z: {{ currentSubjectForGrading.className }}
+    </h2>
+    <h2 *ngIf="isLoadingSubject">Ładowanie danych...</h2>
+    <h2 *ngIf="!isLoadingSubject && !currentSubjectForGrading">Nie udało się załadować danych przedmiotu</h2>
 
-    <label>Wybierz ucznia:</label>
-    <select [(ngModel)]="selectedStudentId">
-      <option *ngFor="let student of students" [value]="student.id">
-        {{ student.name }} {{ student.surname }}
-      </option>
+    <ng-container *ngIf="!isLoadingSubject && currentSubjectForGrading">
+      <label>Wybierz ucznia:</label>
+      <select [(ngModel)]="selectedStudentId" [disabled]="students.length === 0">
+        <option [ngValue]="null" disabled>-- Wybierz ucznia --</option>
+        <option *ngFor="let student of students" [value]="student.id">
+          {{ student.name }} {{ student.surname }}
+        </option>
+      </select>
+      <p *ngIf="students.length === 0 && !isLoadingSubject" class="info-text">Brak uczniów w tej grupie lub nie udało się ich załadować.</p>
 
-    </select>
+      <label>Wybierz ocenę:</label>
+      <select [(ngModel)]="selectedGrade">
+        <option value="" disabled>-- Wybierz ocenę --</option>
+        <option *ngFor="let grade of grades" [value]="grade">{{ grade }}</option>
+      </select>
 
-    <label>Wybierz ocenę:</label>
-    <select [(ngModel)]="selectedGrade">
-      <option *ngFor="let grade of grades" [value]="grade">{{ grade }}</option>
-    </select>
+      <label>Typ oceny (np. Sprawdzian, Kartkówka, Odpowiedź):</label>
+      <input type="text" [(ngModel)]="gradeType" placeholder="Wpisz typ oceny" />
 
-    <label>Typ oceny:</label>
-    <input type="text" [(ngModel)]="gradeType" />
-
-    <label>Dodaj komentarz:</label>
-    <textarea [(ngModel)]="comment"></textarea>
+      <label>Dodaj komentarz (opcjonalnie):</label>
+      <textarea [(ngModel)]="comment" placeholder="Wpisz komentarz"></textarea>
+    </ng-container>
 
     <div class="modal-buttons">
-      <button (click)="saveGrade()">Zapisz</button>
+      <button
+        (click)="saveGrade()"
+        [disabled]="isLoadingSubject || !currentSubjectForGrading || !selectedStudentId || !selectedGrade || !gradeType.trim()">
+        Zapisz
+      </button>
       <button (click)="closeModal()">Anuluj</button>
     </div>
   </div>

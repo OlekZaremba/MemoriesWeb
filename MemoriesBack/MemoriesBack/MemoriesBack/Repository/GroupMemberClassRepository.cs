@@ -35,7 +35,10 @@ namespace MemoriesBack.Repository
         public async Task<GroupMemberClass?> GetFirstByGroupIdAndUserIdAsync(int groupId, int userId)
         {
             return await _context.GroupMemberClasses
+                .Include(gmc => gmc.GroupMember)     // DOŁĄCZ GroupMember (dla bezpieczeństwa i czytelności warunku Where)
+                .Include(gmc => gmc.SchoolClass)     // DOŁĄCZ SchoolClass (kluczowe dla rozwiązania problemu)
                 .Where(gmc =>
+                    gmc.GroupMember != null &&       // Dodatkowe zabezpieczenie
                     gmc.GroupMember.UserGroupId == groupId &&
                     gmc.GroupMember.UserId == userId)
                 .FirstOrDefaultAsync();

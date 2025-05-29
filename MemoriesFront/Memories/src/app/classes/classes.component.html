@@ -2,14 +2,11 @@
   <div class="content">
     <div class="grades">
       <div class="tile">
-        <h2>Przedmioty</h2>
+        <h2>Przedmioty i Grupy</h2> <div class="teacher-control-buttons">
+        <button *ngIf="isAdmin" (click)="openAddSubjectModal()">Dodaj przedmiot</button>
+        <button *ngIf="isAdmin" (click)="openAddGroupModal()" style="margin-left: 10px;">Dodaj grupę</button> </div>
 
-        <!-- Przycisk: Dodaj przedmiot -->
-        <div class="teacher-control-buttons">
-          <button (click)="openAddSubjectModal()">Dodaj przedmiot</button>
-        </div>
-
-        <!-- Tabela przedmiotów -->
+        <h3>Przedmioty</h3>
         <div class="student-grades-table">
           <table class="subjects-table">
             <thead>
@@ -23,16 +20,19 @@
             <tr *ngFor="let subject of subjects">
               <td>{{ subject.className }}</td>
               <td>
-                <div *ngIf="subject.teachers?.length; else brak">
+                <div *ngIf="subject.teachers?.length; else brakNauczycieli">
                   <div *ngFor="let t of subject.teachers">
                     {{ t.teacherName }} ({{ t.groupName }})
                   </div>
                 </div>
-                <ng-template #brak>Brak przypisań</ng-template>
+                <ng-template #brakNauczycieli>Brak przypisań</ng-template>
               </td>
               <td>
                 <button class="goToGrade" (click)="openAssignTeacherModal(subject.id)">Przypisz</button>
               </td>
+            </tr>
+            <tr *ngIf="subjects.length === 0">
+              <td colspan="3" style="text-align: center;">Brak zdefiniowanych przedmiotów.</td>
             </tr>
             </tbody>
           </table>
@@ -42,18 +42,15 @@
   </div>
 </div>
 
-<!-- Modal: Dodaj przedmiot -->
 <div class="modal-backdrop" *ngIf="showAddSubjectModal">
   <div class="modal">
     <h2>Dodaj przedmiot</h2>
-
     <label>Nazwa przedmiotu:</label>
     <input
       type="text"
       [(ngModel)]="newSubjectName"
       placeholder="Wpisz nazwę przedmiotu"
     />
-
     <div class="modal-buttons">
       <button (click)="addSubject()">Zapisz</button>
       <button (click)="closeAddSubjectModal()">Anuluj</button>
@@ -61,19 +58,16 @@
   </div>
 </div>
 
-<!-- Modal: Przypisz przedmiot do relacji nauczyciel-klasa -->
 <div class="modal-backdrop" *ngIf="showAssignTeacherModal">
   <div class="modal">
     <h2>Przypisz przedmiot nauczycielowi w klasie</h2>
-
-    <label>Relacja (nauczyciel – klasa):</label>
+    <label>Relacja (nauczyciel – grupa/klasa):</label>
     <select [(ngModel)]="selectedGroupMemberId">
       <option [ngValue]="null" disabled>-- Wybierz relację --</option>
       <option *ngFor="let gm of groupMembers" [ngValue]="gm.groupMemberId">
         {{ gm.teacherName }} – {{ gm.groupName }}
       </option>
     </select>
-
     <div class="modal-buttons">
       <button (click)="assignSubjectToGroupMember()">Zapisz</button>
       <button (click)="closeAssignTeacherModal()">Anuluj</button>
@@ -81,3 +75,18 @@
   </div>
 </div>
 
+<div class="modal-backdrop" *ngIf="showAddGroupModal">
+  <div class="modal">
+    <h2>Dodaj grupę (klasę)</h2>
+    <label>Nazwa grupy:</label>
+    <input
+      type="text"
+      [(ngModel)]="newGroupName"
+      placeholder="Wpisz nazwę grupy"
+    />
+    <div class="modal-buttons">
+      <button (click)="addGroup()">Zapisz</button>
+      <button (click)="closeAddGroupModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
