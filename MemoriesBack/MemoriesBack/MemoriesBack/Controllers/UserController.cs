@@ -1,4 +1,4 @@
-﻿// Plik: UserController.cs
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -172,72 +172,42 @@ namespace MemoriesBack.Controller
             var studentUser = await _userRepo.GetByIdAsync(studentId);
             if (studentUser == null || studentUser.UserRole != EntityUser.Role.S)
             {
-                // Log.Information($"GetTeachersForStudentAsync: Student not found or user (ID: {studentId}) is not a student.");
                 return NotFound("Student not found or user is not a student.");
             }
 
+            
             var studentGroupMembers = await _groupMemberRepo.GetAllByUserIdAsync(studentId);
-            if (!studentGroupMembers.Any())
-            {
-                // Log.Information($"GetTeachersForStudentAsync: Student (ID: {studentId}) is not a member of any group.");
-                return Ok(new List<UserDTO>()); 
-            }
+            var studentGroupIds = studentGroupMembers.Select(gm => gm.UserGroupId).Distinct().ToList();
 
-            var studentGroupMemberIds = studentGroupMembers.Select(gm => gm.Id).ToList();
-            // Log.Information($"GetTeachersForStudentAsync: Student (ID: {studentId}) GroupMember IDs: {string.Join(", ", studentGroupMemberIds)}");
+            if (!studentGroupIds.Any())
+                return Ok(new List<UserDTO>());
 
-            var classIdsTaughtToStudent = await _context.GroupMemberClasses
-                .Where(gmc => studentGroupMemberIds.Contains(gmc.GroupMemberId) && gmc.SchoolClassId != 0)
-                .Select(gmc => gmc.SchoolClassId)
-                .Distinct()
-                .ToListAsync();
-
-            // Log.Information($"GetTeachersForStudentAsync: Student (ID: {studentId}) is enrolled in Subject (SchoolClass) IDs: {string.Join(", ", classIdsTaughtToStudent)}");
-
-            if (!classIdsTaughtToStudent.Any())
-            {
-                return Ok(new List<UserDTO>()); 
-            }
-
-            var studentUserGroupIds = studentGroupMembers.Select(sgm => sgm.UserGroupId).Distinct().ToList();
-            // Log.Information($"GetTeachersForStudentAsync: Student (ID: {studentId}) is in UserGroup IDs: {string.Join(", ", studentUserGroupIds)}");
-
+            
             var teacherAssignments = await _context.GroupMemberClasses
                 .Include(gmc => gmc.GroupMember)
-                    .ThenInclude(gm => gm.User) 
-                .Include(gmc => gmc.SchoolClass) 
-                .Where(gmc => 
-                    gmc.GroupMember != null && 
-                    gmc.GroupMember.User != null && 
-                    gmc.GroupMember.User.UserRole == EntityUser.Role.T && 
-                    gmc.SchoolClassId != 0 &&
-                    classIdsTaughtToStudent.Contains(gmc.SchoolClassId) && 
-                    studentUserGroupIds.Contains(gmc.GroupMember.UserGroupId) 
+                .ThenInclude(gm => gm.User)
+                .Include(gmc => gmc.SchoolClass)
+                .Where(gmc =>
+                    gmc.GroupMember.User.UserRole == EntityUser.Role.T &&
+                    studentGroupIds.Contains(gmc.GroupMember.UserGroupId)
                 )
                 .ToListAsync();
-            
-            // Log.Information($"GetTeachersForStudentAsync: Found {teacherAssignments.Count} potential teacher assignments for student (ID: {studentId}).");
 
-            var uniqueTeachersWithSubject = teacherAssignments
-                .GroupBy(gmc => gmc.GroupMember.User.Id) 
-                .Select(group => 
+            var teacherDtos = teacherAssignments
+                .Select(gmc => new UserDTO(
+                    gmc.GroupMember.User.Id,
+                    gmc.GroupMember.User.Name,
+                    gmc.GroupMember.User.Surname,
+                    gmc.GroupMember.User.UserRole.ToString(),
+                    null
+                )
                 {
-                    var firstAssignment = group.First(); 
-                    var subjectName = firstAssignment.SchoolClass?.ClassName;
-                    // Log.Information($"Mapping teacher: {firstAssignment.GroupMember.User.Name}, Subject: {subjectName}");
-                    return new UserDTO(
-                        firstAssignment.GroupMember.User.Id,
-                        firstAssignment.GroupMember.User.Name,
-                        firstAssignment.GroupMember.User.Surname,
-                        firstAssignment.GroupMember.User.UserRole.ToString())
-                    {
-                        Subject = subjectName 
-                    };
+                    Subject = gmc.SchoolClass?.ClassName ?? ""
                 })
+                .DistinctBy(dto => dto.Id) 
                 .ToList();
-            
-            // Log.Information($"GetTeachersForStudentAsync: Returning {uniqueTeachersWithSubject.Count} unique teachers for student (ID: {studentId}).");
-            return Ok(uniqueTeachersWithSubject);
+
+            return Ok(teacherDtos);
         }
         
         public class AssignGroupsRequest
@@ -266,7 +236,7 @@ namespace MemoriesBack.Controller
             var user = await _userRepo.GetByIdAsync(userId);
             if (user == null) return NotFound("User not found");
 
-            // Poprawiona linia:
+            
             if (user.UserRole == EntityUser.Role.S)
             {
                 var existing = await _groupMemberRepo.GetAllByUserIdAsync(userId);
@@ -287,7 +257,7 @@ namespace MemoriesBack.Controller
                     await _groupMemberRepo.AddAsync(gm);
                 }
 
-                await _context.SaveChangesAsync(); // Dodane zapisanie zmian
+                await _context.SaveChangesAsync(); 
                 return Ok("Uczeń przypisany do jednej klasy");
             }
 
