@@ -4,7 +4,7 @@
       <div class="tile">
         <h2>Użytkownicy</h2>
 
-        <!-- Widok STUDENTA -->
+
         <div class="student-grades-table" *ngIf="userRole === 'S'">
           <table class="subjects-table">
             <thead>
@@ -22,7 +22,7 @@
           </table>
         </div>
 
-        <!-- Widok NAUCZYCIELA -->
+
         <div class="student-grades-table" *ngIf="userRole === 'T'">
           <table class="subjects-table">
             <thead>
@@ -40,7 +40,7 @@
           </table>
         </div>
 
-        <!-- Widok ADMINISTRATORA -->
+
         <div *ngIf="userRole === 'A'">
           <div class="teacher-control-buttons">
             <button (click)="openCreateModal()">Dodaj użytkownika</button>
@@ -88,7 +88,7 @@
   </div>
 </div>
 
-<!-- Reset password modal -->
+
 <div class="modal-backdrop" *ngIf="showResetModal">
   <div class="modal">
     <h2>Resetowanie hasła</h2>
@@ -101,7 +101,7 @@
   </div>
 </div>
 
-<!-- Assign to group modal -->
+
 <div class="modal-backdrop" *ngIf="showAssignModal">
   <div class="modal">
     <h2>Przypisz do grup</h2>
@@ -124,7 +124,7 @@
   </div>
 </div>
 
-<!-- Edit user modal -->
+
 <div class="modal-backdrop" *ngIf="showEditModal">
   <div class="modal">
     <h2>Edytuj użytkownika</h2>
@@ -148,7 +148,7 @@
   </div>
 </div>
 
-<!-- Create user modal -->
+
 <div class="modal-backdrop" *ngIf="showCreateModal">
   <div class="modal">
     <h2>Dodaj nowego użytkownika</h2>

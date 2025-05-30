@@ -8,7 +8,7 @@
           <button *ngIf="isAdmin" (click)="openEditModal()">Zmiana planu</button>
         </div>
 
-        <!-- Lista lekcji -->
+
         <div class="schedule-list">
           <div class="lesson-item" *ngFor="let lesson of lessons">
             <div class="lesson-header">
@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<!-- Modal: Edycja planu zajęć -->
+
 <div class="modal-backdrop" *ngIf="showEditModal">
   <div class="modal">
     <h2>Edycja planu zajęć</h2>

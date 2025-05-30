@@ -1,11 +1,10 @@
-import { Component, EventEmitter, inject, OnInit, Output, PLATFORM_ID } from '@angular/core'; // Dodaj PLATFORM_ID
-import { CommonModule, isPlatformBrowser } from '@angular/common'; // Dodaj CommonModule i isPlatformBrowser
+import { Component, EventEmitter, inject, OnInit, Output, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
-// Stała BASE_URL, taka sama jak w ScheduleComponent
+
 const BASE_URL = 'http://localhost:5017';
 
-// Interfejs dla lekcji pobieranych z API (zgodny z ScheduleResponseDTO)
 interface LessonFromAPI {
   id: number;
   assignmentId: number;
@@ -21,7 +20,7 @@ interface LessonFromAPI {
   selector: 'app-home',
   standalone: true,
   imports: [
-    CommonModule, // Zamiast indywidualnych NgForOf, NgIf. Dostarcza obie dyrektywy.
+    CommonModule,
     HttpClientModule
   ],
   templateUrl: './home.component.html',
@@ -31,11 +30,11 @@ export class HomeComponent implements OnInit {
   @Output() navigateTo = new EventEmitter<string>();
 
   todayLessons: LessonFromAPI[] = [];
-  isLoading: boolean = true; // Dodajemy flagę ładowania
-  errorMessage: string | null = null; // Dodajemy miejsce na komunikat błędu
+  isLoading: boolean = true;
+  errorMessage: string | null = null;
 
   private http = inject(HttpClient);
-  private platformId = inject(PLATFORM_ID); // Wstrzykujemy PLATFORM_ID
+  private platformId = inject(PLATFORM_ID);
 
   ngOnInit(): void {
     this.loadTodaysLessonsForStudent();
@@ -52,7 +51,7 @@ export class HomeComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    if (isPlatformBrowser(this.platformId)) { // Uruchamiaj tylko w przeglądarce
+    if (isPlatformBrowser(this.platformId)) {
       const groupId = sessionStorage.getItem('groupId');
 
       if (groupId) {
@@ -77,11 +76,8 @@ export class HomeComponent implements OnInit {
         this.todayLessons = [];
       }
     } else {
-      // Logika dla SSR (np. nie rób nic lub załaduj domyślne dane)
       console.log('SSR: Pomijanie ładowania lekcji z sessionStorage.');
       this.isLoading = false;
-      // Możesz ustawić odpowiedni komunikat dla SSR, jeśli jest taka potrzeba
-      // this.errorMessage = 'Plan lekcji będzie dostępny po załadowaniu strony w przeglądarce.';
     }
   }
 
@@ -89,7 +85,7 @@ export class HomeComponent implements OnInit {
     return this.todayLessons;
   }
 
-  // ... reszta metod goTo... bez zmian
+
   goToGrades(): void { this.navigateTo.emit('oceny'); }
   goToUsers(): void { this.navigateTo.emit('uzytkownicy'); }
   goToSummary(): void { this.navigateTo.emit('wykresy'); }

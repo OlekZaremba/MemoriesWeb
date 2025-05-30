@@ -28,7 +28,7 @@
 .content-right {
   height: 100%;
   width: 60%;
-  display: flex; /* <- konieczne */
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
@@ -176,7 +176,6 @@
   font-style: italic;
 }
 
-/* Dodaj do home.component.css */
 .info-message {
   text-align: center;
   padding: 1rem;
@@ -189,8 +188,8 @@
   text-align: center;
   padding: 1rem;
   font-size: 1.1rem;
-  color: #D8000C; /* Czerwony kolor dla błędu */
-  background-color: #FFD2D2; /* Jasnoczerwone tło */
+  color: #D8000C;
+  background-color: #FFD2D2;
   border: 1px solid #D8000C;
   border-radius: 5px;
   margin-top: 1rem;
