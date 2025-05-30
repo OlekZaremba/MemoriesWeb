@@ -266,17 +266,38 @@ namespace MemoriesBack.Controller
             var user = await _userRepo.GetByIdAsync(userId);
             if (user == null) return NotFound("User not found");
 
+            // Poprawiona linia:
+            if (user.UserRole == EntityUser.Role.S)
+            {
+                var existing = await _groupMemberRepo.GetAllByUserIdAsync(userId);
+                foreach (var gm in existing)
+                {
+                    _context.GroupMembers.Remove(gm); 
+                }
+
+                var firstGroupId = request.GroupIds.FirstOrDefault();
+                var group = await _userGroupRepo.GetByIdAsync(firstGroupId);
+                if (group != null)
+                {
+                    var gm = new GroupMember
+                    {
+                        UserId = userId,
+                        UserGroupId = group.Id
+                    };
+                    await _groupMemberRepo.AddAsync(gm);
+                }
+
+                await _context.SaveChangesAsync(); // Dodane zapisanie zmian
+                return Ok("Uczeń przypisany do jednej klasy");
+            }
+
             foreach (var groupId in request.GroupIds)
             {
                 var group = await _userGroupRepo.GetByIdAsync(groupId);
-                if (group == null) 
-                {
-                    Console.WriteLine($"Warning: Group with ID {groupId} not found during assignment to user {userId}.");
-                    continue; 
-                }
+                if (group == null) continue;
 
                 var exists = await _groupMemberRepo.GetByUserIdAndGroupIdAsync(userId, groupId);
-                if (exists != null) continue; 
+                if (exists != null) continue;
 
                 var gm = new GroupMember
                 {
