@@ -13,7 +13,7 @@ namespace MemoriesBack.Service
         private readonly EmailService _emailService;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        // Tymczasowy magazyn tokenów (token -> SensitiveData)
+        
         private static readonly ConcurrentDictionary<string, SensitiveData> ResetTokens = new();
 
         public PasswordResetService(

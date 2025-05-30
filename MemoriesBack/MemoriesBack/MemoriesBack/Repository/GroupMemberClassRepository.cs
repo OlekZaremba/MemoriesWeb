@@ -1,7 +1,4 @@
-﻿// Plik: GroupMemberClassRepository.cs
-// Lokalizacja: MemoriesBack/Repository/GroupMemberClassRepository.cs
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +7,7 @@ using MemoriesBack.Entities;
 
 namespace MemoriesBack.Repository
 {
-    // ZMIANA: Dodano ": IGroupMemberClassRepository"
+    
     public class GroupMemberClassRepository : IGroupMemberClassRepository
     {
         private readonly AppDbContext _context;
@@ -28,8 +25,8 @@ namespace MemoriesBack.Repository
                 .ToListAsync();
         }
         
-        // Ta metoda nie jest w interfejsie IGroupMemberClassRepository (zdefiniowanym powyżej),
-        // ale zostawiam ją w klasie, jeśli jest używana gdzieś indziej bezpośrednio.
+        
+        
         public async Task<List<GroupMemberClass>> GetByGroupIdAsync(int groupId)
         {
             return await _context.GroupMemberClasses
@@ -49,8 +46,8 @@ namespace MemoriesBack.Repository
                 .FirstOrDefaultAsync();
         }
 
-        // Ta metoda nie jest w interfejsie IGroupMemberClassRepository (zdefiniowanym powyżej),
-        // ale zostawiam ją w klasie. Interfejs używa GetAllByGroupMemberIdAsync.
+        
+        
         public async Task<List<GroupMemberClass>> GetByGroupMemberIdAsync(int groupMemberId) 
         {                                                                                  
             return await _context.GroupMemberClasses
@@ -58,7 +55,7 @@ namespace MemoriesBack.Repository
                 .ToListAsync();
         }
 
-        // Ta metoda nie jest w interfejsie IGroupMemberClassRepository
+        
         public async Task<List<GroupMemberClass>> GetByClassIdAsync(int classId)
         {
             return await _context.GroupMemberClasses
@@ -92,19 +89,19 @@ namespace MemoriesBack.Repository
             await _context.SaveChangesAsync();
         }
         
-        // Ta metoda nie jest w interfejsie IGroupMemberClassRepository
+        
         public async Task<List<GroupMemberClass>> GetFullInfoByClassIdAsync(int classId)
         {
             return await _context.GroupMemberClasses
                 .Where(gmc => gmc.SchoolClassId == classId)
                 .Include(gmc => gmc.GroupMember)
                 .ThenInclude(gm => gm.User)
-                .Include(gmc => gmc.GroupMember) // Powtórzony Include, zostawiam jak w oryginale
+                .Include(gmc => gmc.GroupMember) 
                 .ThenInclude(gm => gm.UserGroup)
                 .ToListAsync();
         }
         
-        // Ta metoda nie jest w interfejsie IGroupMemberClassRepository
+        
         public async Task<List<GroupMemberClass>> GetAllAssignmentsWithClassAndTeacher()
         {
             return await _context.GroupMemberClasses

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using MemoriesBack.Data;
-using MemoriesBack.Repository; // Upewnij się, że ta przestrzeń nazw zawiera interfejsy i klasy repozytoriów
+using MemoriesBack.Repository; 
 using MemoriesBack.Entities;
 using Microsoft.AspNetCore.Identity;
 using MemoriesBack.Service;
@@ -40,13 +40,10 @@ namespace MemoriesBack
                 });
 
 
-            // Rejestracja repozytoriów i serwisów
             builder.Services.AddScoped<GradeRepository>();
-            // ZMIANA TUTAJ: Mapowanie interfejsu na implementację
             builder.Services.AddScoped<IGroupMemberClassRepository, GroupMemberClassRepository>(); 
             builder.Services.AddScoped<GroupMemberRepository>();
             builder.Services.AddScoped<PasswordResetTokenRepository>();
-            // ZMIANA TUTAJ: Mapowanie interfejsu na implementację
             builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>(); 
             builder.Services.AddScoped<SchoolClassRepository>();
             builder.Services.AddScoped<SensitiveDataRepository>();
@@ -62,16 +59,14 @@ namespace MemoriesBack
             builder.Services.AddScoped<UserGroupService>();
             builder.Services.AddScoped<GroupMemberClassService>();
             builder.Services.AddScoped<GradeService>();
-            builder.Services.AddScoped<ScheduleService>(); // Ten serwis będzie teraz poprawnie otrzymywał zależności
+            builder.Services.AddScoped<ScheduleService>(); 
 
 
             builder.Services.Configure<FormOptions>(options =>
             {
-                options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
+                options.MultipartBodyLengthLimit = 10 * 1024 * 1024; 
             });
 
-            // AddControllers() było już wyżej, można usunąć duplikat, jeśli nie ma specjalnego powodu
-            // builder.Services.AddControllers(); 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -79,11 +74,9 @@ namespace MemoriesBack
 
             app.UseMiddleware<MemoriesBack.Middlewares.ExceptionMiddleware>();
 
-            // Apply migrations
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                // Uważaj z automatyczną migracją w produkcji, ale OK dla developmentu
                 db.Database.Migrate(); 
             }
 
@@ -95,8 +88,8 @@ namespace MemoriesBack
     
             app.UseCors("AllowAngularApp");
             app.UseRouting();
-            app.UseStaticFiles(); // Jeśli serwujesz pliki statyczne
-            app.UseAuthentication(); // Jeśli używasz autentykacji
+            app.UseStaticFiles(); 
+            app.UseAuthentication(); 
             app.UseAuthorization();
             app.MapControllers();
             app.Run();

@@ -1,4 +1,4 @@
-﻿// Plik: GradeService.cs
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MemoriesBack.DTO;
 using MemoriesBack.Entities;
-using MemoriesBack.Repository; // Upewnij się, że ta przestrzeń nazw zawiera interfejsy
+using MemoriesBack.Repository; 
 
 namespace MemoriesBack.Service
 {
     public class GradeService
     {
         private readonly GroupMemberRepository _groupMemberRepository; 
-        // ZMIANA: Użycie interfejsu
+        
         private readonly IGroupMemberClassRepository _groupMemberClassRepository;
         private readonly GradeRepository _gradeRepository; 
         private readonly UserRepository _userRepository; 
@@ -22,7 +22,7 @@ namespace MemoriesBack.Service
 
         public GradeService(
             GroupMemberRepository groupMemberRepository,
-            // ZMIANA: Typ parametru na interfejs
+            
             IGroupMemberClassRepository groupMemberClassRepository,
             GradeRepository gradeRepository,
             UserRepository userRepository,
@@ -80,7 +80,7 @@ namespace MemoriesBack.Service
 
             foreach (var sc in distinctSchoolClasses)
             {
-                if (sc == null) continue; // Dodatkowe zabezpieczenie
+                if (sc == null) continue; 
                 var gradesForThisSubject = studentGrades
                     .Where(g => g.SchoolClassId == sc.Id)
                     .ToList();
@@ -117,7 +117,7 @@ namespace MemoriesBack.Service
             var g = await _gradeRepository.GetByIdAsync(gradeId)
                 ?? throw new ArgumentException("Ocena nie istnieje");
 
-            // Upewnij się, że GetByIdAsync w GradeRepository dołącza Student, Teacher, SchoolClass
+            
             return new GradeDetailDTO(
                 g.Id,
                 g.GradeValue,
@@ -159,7 +159,7 @@ namespace MemoriesBack.Service
             var result = new List<SchoolClassDTO>();
             foreach (var sc in classes)
             {
-                if (sc == null) continue; // Dodatkowe zabezpieczenie
+                if (sc == null) continue; 
                 var grades = await _gradeRepository.GetByTeacherAndClassAsync(teacherId, sc.Id);
                 double avg = grades.Any() ? grades.Average(g => g.GradeValue) : 0.0;
 
@@ -180,7 +180,7 @@ namespace MemoriesBack.Service
 
             foreach (var studentUser in members.Where(m => m.User != null && m.User.UserRole == User.Role.S).Select(m => m.User))
             {
-                if (studentUser == null) continue; // Dodatkowe zabezpieczenie
+                if (studentUser == null) continue; 
                 var grades = await _gradeRepository.GetByStudentIdAsync(studentUser.Id);
 
                 var gradeDtos = grades.Select(g => new GradeSimpleDTO(

@@ -1,11 +1,11 @@
-﻿// Plik: AuthService.cs
+﻿
 using System;
 using System.Linq; 
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using MemoriesBack.Entities;
-using MemoriesBack.Repository; // Upewnij się, że ta przestrzeń nazw zawiera interfejsy
+using MemoriesBack.Repository; 
 using MemoriesBack.DTO;
 
 namespace MemoriesBack.Service
@@ -17,7 +17,7 @@ namespace MemoriesBack.Service
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly UserGroupRepository _userGroupRepository;
         private readonly GroupMemberRepository _groupMemberRepository;
-        // ZMIANA: Użycie interfejsu
+        
         private readonly IGroupMemberClassRepository _groupMemberClassRepository;
 
         public AuthService(
@@ -26,7 +26,7 @@ namespace MemoriesBack.Service
             IPasswordHasher<User> passwordHasher,
             UserGroupRepository userGroupRepository,
             GroupMemberRepository groupMemberRepository,
-            // ZMIANA: Typ parametru na interfejs
+            
             IGroupMemberClassRepository groupMemberClassRepository)
         {
             _sensitiveDataRepository = sensitiveDataRepository;
@@ -55,14 +55,14 @@ namespace MemoriesBack.Service
             if (members != null && members.Any())
             {
                 var firstMember = members.First();
-                // Zakładamy, że UserGroup jest ładowane przez GetAllByUserIdAsync lub pobieramy je osobno
+                
                 var userGroup = firstMember.UserGroup; 
                 if (userGroup == null && firstMember.UserGroupId != 0) 
                 {
-                    // Jeśli UserGroup nie zostało załadowane z GroupMember, spróbuj załadować je przez UserGroupRepository
-                    // To wymagałoby, aby UserGroupRepository było dostępne i miało odpowiednią metodę.
-                    // Dla uproszczenia, zakładamy, że jeśli UserGroupId jest ustawione, to grupa istnieje.
-                    // Idealnie, GetAllByUserIdAsync powinno robić .Include(gm => gm.UserGroup)
+                    
+                    
+                    
+                    
                     var tempGroup = await _userGroupRepository.GetByIdAsync(firstMember.UserGroupId);
                     className = tempGroup?.GroupName;
                 }
@@ -99,7 +99,7 @@ namespace MemoriesBack.Service
                 UserRole = request.Role
             };
 
-            await _userRepository.AddAsync(user); // Najpierw zapisz użytkownika, aby uzyskać user.Id
+            await _userRepository.AddAsync(user); 
 
             var sensitive = new SensitiveData
             {

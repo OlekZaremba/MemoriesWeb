@@ -1,11 +1,8 @@
-// Plik: IScheduleRepository.cs
-// Lokalizacja: np. MemoriesBack/Repository/IScheduleRepository.cs
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MemoriesBack.Entities;
-using MemoriesBack.DTOs; // Dla ScheduleResponseDTO
+using MemoriesBack.DTOs; 
 
 namespace MemoriesBack.Repository
 {

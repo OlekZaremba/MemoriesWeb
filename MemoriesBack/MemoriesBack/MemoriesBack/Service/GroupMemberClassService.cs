@@ -1,20 +1,20 @@
-﻿// Plik: GroupMemberClassService.cs
+﻿
 using System;
 using System.Collections.Generic; 
 using System.Linq; 
 using System.Threading.Tasks;
 using MemoriesBack.DTO;
 using MemoriesBack.Entities;
-using MemoriesBack.Repository; // Upewnij się, że ta przestrzeń nazw zawiera interfejsy
+using MemoriesBack.Repository; 
 
 namespace MemoriesBack.Service
 {
     public class GroupMemberClassService
     {
-        // ZMIANA: Użycie interfejsu (było już poprawne w Twoim kodzie)
+        
         private readonly IGroupMemberClassRepository _repository;
 
-        // ZMIANA: Typ parametru na interfejs (było już poprawne w Twoim kodzie)
+        
         public GroupMemberClassService(IGroupMemberClassRepository repository)
         {
             _repository = repository;
@@ -22,19 +22,19 @@ namespace MemoriesBack.Service
 
         public async Task<ClassDTO> FindSubjectByGroupAndTeacherAsync(int groupId, int teacherId)
         {
-            // Używamy metody z interfejsu
+            
             var gmc = await _repository.GetFirstByGroupIdAndUserIdAsync(groupId, teacherId);
             if (gmc == null)
                 throw new ArgumentException("Brak przypisania nauczyciela do przedmiotu w tej grupie.");
 
-            if (gmc.SchoolClass == null) // Zakładamy, że repozytorium (przez interfejs) załadowało SchoolClass
+            if (gmc.SchoolClass == null) 
                 throw new InvalidOperationException("Nie udało się załadować danych przedmiotu dla znalezionego przypisania.");
 
             return new ClassDTO(gmc.SchoolClass.Id, gmc.SchoolClass.ClassName);
         }
         public async Task<List<AssignmentDTO>> GetAssignmentsForGroup(int groupId)
         {
-            // Używamy metody z interfejsu
+            
             var gmcList = await _repository.GetByUserGroupIdAsync(groupId);
 
             Console.WriteLine($"🔍 Dla grupy {groupId} znaleziono {gmcList.Count} przypisań");

@@ -1,6 +1,3 @@
-// Plik: IGroupMemberClassRepository.cs
-// Lokalizacja: np. MemoriesBack/Repository/IGroupMemberClassRepository.cs
-
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MemoriesBack.Entities;
@@ -15,7 +12,7 @@ namespace MemoriesBack.Repository
         Task<List<GroupMemberClass>> GetAllByGroupMemberIdAsync(int groupMemberId); 
         Task AddAsync(GroupMemberClass entity);
 
-        // NOWA METODA - dodana, aby pasowała do użycia w AssignmentService
+        
         Task<List<GroupMemberClass>> GetAllAssignmentsWithClassAndTeacher(); 
     }
 }

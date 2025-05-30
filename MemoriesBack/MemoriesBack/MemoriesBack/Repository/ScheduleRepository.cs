@@ -1,5 +1,5 @@
-﻿// Plik: ScheduleRepository.cs
-// Lokalizacja: MemoriesBack/Repository/ScheduleRepository.cs
+﻿
+
 
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using MemoriesBack.DTOs;
 
 namespace MemoriesBack.Repository
 {
-    // ZMIANA: Dodano ": IScheduleRepository"
+    
     public class ScheduleRepository : IScheduleRepository
     {
         private readonly AppDbContext _context;
@@ -92,9 +92,9 @@ namespace MemoriesBack.Repository
                 .Include(s => s.GroupMemberClass)
                     .ThenInclude(gmc => gmc.GroupMember)
                         .ThenInclude(gm => gm.User)
-                .Include(s => s.GroupMemberClass) // Ten Include jest powtórzony, ale zostawiam jak w oryginale
+                .Include(s => s.GroupMemberClass) 
                     .ThenInclude(gmc => gmc.SchoolClass)
-                .Include(s => s.GroupMemberClass) // Ten Include jest powtórzony, ale zostawiam jak w oryginale
+                .Include(s => s.GroupMemberClass) 
                     .ThenInclude(gmc => gmc.GroupMember.UserGroup)
                 .Where(s => s.LessonDate >= from && s.LessonDate <= to)
                 .ToListAsync();

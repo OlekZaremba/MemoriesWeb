@@ -1,4 +1,4 @@
-﻿// Plik: AssignmentService.cs
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,7 +88,7 @@ namespace MemoriesBack.Service
         
         public async Task<List<AssignmentDTO>> GetAllAssignmentsAsync()
         {
-            // Teraz ta metoda powinna być rozpoznawana przez interfejs
+            
             var assignments = await _gmClassRepo.GetAllAssignmentsWithClassAndTeacher(); 
 
             return assignments

@@ -23,7 +23,7 @@ namespace MemoriesBack.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Konwerter ról: enum <-> string
+            
             var roleConverter = new ValueConverter<User.Role, string>(
                 v => v.ToString(),                     
                 v => Enum.Parse<User.Role>(v)         
