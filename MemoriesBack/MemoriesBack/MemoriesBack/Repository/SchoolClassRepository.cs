@@ -25,6 +25,12 @@ namespace MemoriesBack.Repository
             return await _context.SchoolClasses.FindAsync(id);
         }
 
+        public async Task<SchoolClass?> GetByNameAsync(string className)
+        {
+            return await _context.SchoolClasses
+                .FirstOrDefaultAsync(sc => sc.ClassName == className);
+        }
+
         public async Task AddAsync(SchoolClass schoolClass)
         {
             await _context.SchoolClasses.AddAsync(schoolClass);

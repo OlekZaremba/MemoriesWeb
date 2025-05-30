@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgForOf, CommonModule, isPlatformBrowser } from '@angular/common'; // Dodano CommonModule i isPlatformBrowser
+import { NgIf, NgForOf, CommonModule, isPlatformBrowser } from '@angular/common';
 import { environment } from '../../environments/environment';
 
 interface SubjectDTO {
@@ -23,22 +23,19 @@ interface GroupMemberDTO {
   groupName: string;
 }
 
-// DTO dla tworzenia grupy, zgodnie z GroupController.cs
 interface CreateGroupRequest {
   groupName: string;
 }
 
-// DTO dla odpowiedzi po utworzeniu grupy, zgodnie z GroupController.cs
 interface GroupDTO {
   id: number;
   groupName: string;
 }
 
-
 @Component({
   selector: 'app-classes',
   standalone: true,
-  imports: [CommonModule, FormsModule], // CommonModule zastępuje NgIf, NgForOf
+  imports: [CommonModule, FormsModule],
   templateUrl: './classes.component.html',
   styleUrl: './classes.component.css'
 })
@@ -46,14 +43,14 @@ export class ClassesComponent implements OnInit {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
 
-  isAdmin: boolean = false; // Flaga dla roli admina
+  isAdmin: boolean = false;
 
   showAddSubjectModal = false;
   showAssignTeacherModal = false;
-  showAddGroupModal = false; // NOWA FLAGA MODALA
+  showAddGroupModal = false;
 
   newSubjectName: string = '';
-  newGroupName: string = ''; // NOWA WŁAŚCIWOŚĆ DLA NAZWY GRUPY
+  newGroupName: string = '';
 
   subjects: SubjectDTO[] = [];
   groupMembers: GroupMemberDTO[] = [];
@@ -62,7 +59,7 @@ export class ClassesComponent implements OnInit {
   selectedGroupMemberId: number | null = null;
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) { // Sprawdzanie platformy przed dostępem do sessionStorage
+    if (isPlatformBrowser(this.platformId)) {
       const role = sessionStorage.getItem('userRole');
       this.isAdmin = role === 'A';
     }
@@ -75,7 +72,7 @@ export class ClassesComponent implements OnInit {
       next: res => {
         this.subjects = res;
         this.subjects.forEach(subject => {
-          this.http.get<ClassTeacherDTO[]>(`${environment.apiUrl}/class/${subject.id}/teachers`)
+          this.http.get<ClassTeacherDTO[]>(`${environment.apiUrl}/classes/${subject.id}/teachers`)
             .subscribe({
               next: teachers => subject.teachers = teachers,
               error: err => console.error(`Błąd ładowania nauczycieli dla przedmiotu ${subject.className}:`, err)
@@ -93,7 +90,6 @@ export class ClassesComponent implements OnInit {
     });
   }
 
-  // --- Zarządzanie Przedmiotami ---
   openAddSubjectModal() {
     this.newSubjectName = '';
     this.showAddSubjectModal = true;
@@ -124,11 +120,23 @@ export class ClassesComponent implements OnInit {
 
   openAssignTeacherModal(subjectId: number) {
     this.selectedSubjectId = subjectId;
-    this.selectedGroupMemberId = null; // Resetuj wybór
-    if (this.groupMembers.length === 0) {
-      alert("Brak dostępnych relacji nauczyciel-grupa do przypisania. Najpierw zdefiniuj nauczycieli i grupy oraz ich powiązania.");
-    }
-    this.showAssignTeacherModal = true;
+    this.selectedGroupMemberId = null;
+
+    this.http.get<GroupMemberDTO[]>(`${environment.apiUrl}/group-members/teachers-with-groups`).subscribe({
+      next: res => {
+        this.groupMembers = res;
+        this.filterAssignableGroupMembers(subjectId);
+        if (this.groupMembers.length === 0) {
+          alert("Wszyscy nauczyciele dla tego przedmiotu już zostali przypisani.");
+        } else {
+          this.showAssignTeacherModal = true;
+        }
+      },
+      error: err => {
+        console.error('Błąd ładowania relacji nauczyciel-klasa:', err);
+        alert("Wystąpił błąd podczas ładowania relacji nauczyciel–klasa.");
+      }
+    });
   }
 
   closeAssignTeacherModal() {
@@ -147,6 +155,7 @@ export class ClassesComponent implements OnInit {
           alert('Przypisano przedmiot do nauczyciela w grupie.');
           this.closeAssignTeacherModal();
           this.loadSubjects();
+          this.loadGroupMembers(); // <- odśwież relacje
         },
         error: err => {
           console.error('Błąd przypisania przedmiotu:', err);
@@ -155,7 +164,26 @@ export class ClassesComponent implements OnInit {
       });
   }
 
-  // --- NOWE METODY: Zarządzanie Grupami ---
+  filterAssignableGroupMembers(subjectId: number) {
+    const subject = this.subjects.find(s => s.id === subjectId);
+    if (!subject) return;
+
+    const assignedKeys = new Set(
+      (subject.teachers || []).map(t => `${t.teacherId}-${t.groupId}`)
+    );
+
+    this.groupMembers = this.groupMembers.filter(gm => {
+      const key = `${gm.groupMemberId}`;
+      // Dla uproszczenia – klucze są porównywane tylko po ID, co działa jeśli ID = teacherId+groupId (czyli unikalna relacja)
+      const matching = subject.teachers?.find(t =>
+        `${t.teacherName} (${t.groupName})` === `${gm.teacherName} (${gm.groupName})`
+      );
+      if (!matching) return true;
+      const compoundKey = `${matching.teacherId}-${matching.groupId}`;
+      return !assignedKeys.has(compoundKey);
+    });
+  }
+
   openAddGroupModal() {
     this.newGroupName = '';
     this.showAddGroupModal = true;
@@ -174,9 +202,6 @@ export class ClassesComponent implements OnInit {
 
     const payload: CreateGroupRequest = { groupName: name };
 
-    // Zmieniony endpoint - zakładamy, że environment.apiUrl zawiera już /api
-    // np. environment.apiUrl = "http://localhost:5017/api"
-    // wtedy pełny URL do GroupController będzie "http://localhost:5017/api/groups"
     this.http.post<GroupDTO>(`${environment.apiUrl}/groups`, payload).subscribe({
       next: (newGroup) => {
         alert(`Grupa "${newGroup.groupName}" dodana pomyślnie.`);
